@@ -1,7 +1,7 @@
 #include "stdio.h"
 #include <stddef.h>
 
-#define ASSERT(condition) assert((condition), (#condition))
+#define ASSERT(condition) assert((condition), (#condition), __FILE__, __LINE__)
 
 typedef enum
 {
@@ -9,18 +9,16 @@ typedef enum
     true
 } boolean;
 
-void assert(boolean condition, char* condition_expression)
+void assert(boolean condition, const char* condition_expression, const char* fileName, int lineNumber)
 {
-    static size_t assertion_counter = 1;
     if (condition == true)
     {
-        printf("Assertion %lu: PASSED", assertion_counter);
+        printf("%s:%d PASSED", fileName, lineNumber);
     }
     else
     {
-        printf("Assertion %lu, with expression %s: FAILED", assertion_counter, condition_expression);
+        printf("%s:%d FAILED, expression %s", fileName, lineNumber, condition_expression);
     }
-    ++assertion_counter;
 }
 
 void test1()
