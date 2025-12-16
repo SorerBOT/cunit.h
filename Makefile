@@ -1,6 +1,6 @@
 CC=gcc
-SRCS=$(wildcard, ./tests/*.c)
-OBJS=$(pathsubst ./tests/%.c,./bin/%.o,$(SRCS))
+SRCS:=$(wildcard tests/*.c)
+OBJS:=$(patsubst tests/%.c,bin/%.o,$(SRCS))
 CFLAGS=-g -O0
 
 all: pre-build $(OBJS)
@@ -9,7 +9,7 @@ all: pre-build $(OBJS)
 pre-build:
 	mkdir -p ./bin
 
-./bin/%.o: ./%.c
+bin/%.o: tests/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
