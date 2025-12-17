@@ -37,7 +37,6 @@ void cunit_run_test(const cunit_test_t* test)
         waitpid(child_process_pid, &stat_loc, 0);
         if (WIFEXITED(stat_loc))
         {
-            int exit_code = WEXITSTATUS(stat_loc);
         }
         else if (WIFSIGNALED(stat_loc))
         {

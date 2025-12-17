@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <signal.h>
-#include "../lib/cuint.h"
+#include "../lib/cunit.h"
 
 void test1()
 {
