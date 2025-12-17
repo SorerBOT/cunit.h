@@ -15,9 +15,8 @@ int main()
     for (size_t i = 0; i < 3; ++i)
     {
         printf("============================================\n");
-        printf("Test %lu:\n", i+1);
         cunit_test_func current_test = tests[i];
-        current_test();
+        cunit_test(current_test);
     }
     printf("============================================\n");
 }
