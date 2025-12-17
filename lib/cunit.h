@@ -8,7 +8,8 @@
 #include <sys/wait.h>
 #include <string.h>
 
-#define ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__)
+#define ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 1)
+#define EXPECT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 0)
 
 #define ERROR_MESSAGE_BUFFER 256
 
@@ -72,15 +73,17 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
     printf("============================================\n");
 }
 
-void cunit_assert(int condition, const char* condition_expression, const char* fileName, int lineNumber)
+void cunit_assert(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort)
 {
     if (condition)
     {
-        printf("%s:%d PASSED\n", fileName, lineNumber);
+        return;
     }
-    else
+
+    printf("%s:%d FAILED. Expected %s\n", fileName, lineNumber, condition_expression);
+
+    if (shouldAbort)
     {
-        printf("%s:%d FAILED. Expected %s\n", fileName, lineNumber, condition_expression);
         fflush(stdout);
         abort();
     }

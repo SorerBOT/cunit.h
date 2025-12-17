@@ -4,8 +4,8 @@
 
 void test1()
 {
-    ASSERT(1+2 == 2);
-    ASSERT(1+2 == 2);
+    EXPECT(1+2 == 2);
+    EXPECT(1+2 == 2);
     ASSERT(1+2 == 2);
     ASSERT(1+2 == 2);
 }
