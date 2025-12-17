@@ -11,6 +11,9 @@
 #define ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 1)
 #define EXPECT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 0)
 
+#define ASSERT_INT_EQ(a,b) cunit_assert_int_eq(a, b, __FILE__, __LINE__, 1)
+#define EXPECT_INT_EQ(a,b) cunit_assert_int_eq(a, b, __FILE__, __LINE__, 0)
+
 #define ERROR_MESSAGE_BUFFER 256
 
 typedef void(*cunit_test_func)(void);
@@ -81,6 +84,22 @@ void cunit_assert(int condition, const char* condition_expression, const char* f
     }
 
     printf("%s:%d FAILED. Expected %s\n", fileName, lineNumber, condition_expression);
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_int_eq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort)
+{
+    if (a == b)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected %jd == %jd\n", fileName, lineNumber, a, b);
 
     if (shouldAbort)
     {
