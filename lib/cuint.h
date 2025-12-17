@@ -5,8 +5,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
 
 #define ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__)
+
+#define ERROR_MESSAGE_BUFFER 256
 
 typedef void(*cunit_test_func)(void);
 typedef struct
@@ -38,7 +41,10 @@ void cunit_run_test(const cunit_test_t* test)
         }
         else if (WIFSIGNALED(stat_loc))
         {
-            // crashed
+            int signal = WTERMSIG(stat_loc);
+            char error_message[ERROR_MESSAGE_BUFFER];
+            strsignal_r(signal, error_message, ERROR_MESSAGE_BUFFER);
+            printf("Test crashed with the error:\n%s\n", error_message);
         }
     }
 }
