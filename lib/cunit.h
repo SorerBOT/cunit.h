@@ -11,10 +11,29 @@
 #define ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 1)
 #define EXPECT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 0)
 
-#define ASSERT_INT_EQ(a,b) cunit_assert_int_eq(a, b, __FILE__, __LINE__, 1)
-#define EXPECT_INT_EQ(a,b) cunit_assert_int_eq(a, b, __FILE__, __LINE__, 0)
+#define ASSERT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 1)
+#define EXPECT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 0)
+
+#define ASSERT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, 0.0001)
+#define ASSERT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, (threshold))
+#define EXPECT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, 0.0001)
+#define EXPECT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, (threshold))
 
 #define ERROR_MESSAGE_BUFFER 256
+
+
+long double fabsl(long double x)
+{
+    if (x >= 0)
+    {
+        return x;
+    }
+    else
+    {
+        return -x;
+    }
+
+}
 
 typedef void(*cunit_test_func)(void);
 typedef struct
@@ -100,6 +119,22 @@ void cunit_assert_int_eq(intmax_t a, intmax_t b, const char* fileName, int lineN
     }
 
     printf("%s:%d FAILED. Expected %jd == %jd\n", fileName, lineNumber, a, b);
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_float_eq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold)
+{
+    if (fabsl(a - b) < threshold)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected %Lf == %Lf\n", fileName, lineNumber, a, b);
 
     if (shouldAbort)
     {
