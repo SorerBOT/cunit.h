@@ -1,10 +1,10 @@
 CC=gcc
 SRCS:=$(wildcard tests/*.c)
 OBJS:=$(patsubst tests/%.c,bin/%.o,$(SRCS))
-CFLAGS=-fsanitize=address -g -O0
+CFLAGS= -g -O0
 
 all: pre-build $(OBJS)
-	$(CC) $(OBJS) -fsanitize=address -o ./bin/test
+	$(CC) $(OBJS) -o ./bin/test
 
 pre-build:
 	mkdir -p ./bin

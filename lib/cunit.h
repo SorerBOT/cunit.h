@@ -1,6 +1,7 @@
 #ifndef CUNIT_H
 #define CUNIT_H
 
+#include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -41,12 +42,24 @@ void cunit_run_test(const cunit_test_t* test)
         else if (WIFSIGNALED(stat_loc))
         {
             int signal = WTERMSIG(stat_loc);
+            if (signal == SIGABRT)
+            {
+                return;
+            }
+
             char error_message[ERROR_MESSAGE_BUFFER];
-            strsignal_r(signal, error_message, ERROR_MESSAGE_BUFFER);
-            printf("Test crashed with the error:\n%s\n", error_message);
+            if (strsignal_r(signal, error_message, ERROR_MESSAGE_BUFFER) == 0)
+            {
+                printf("Test crashed with the error:\n%s\n", error_message);
+            }
+            else
+            {
+                printf("Test crashed. Failed to find the crash error.\n");
+            }
         }
     }
 }
+
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
 {
     for (size_t i = 0; i < tests_count; ++i)
@@ -68,6 +81,8 @@ void cunit_assert(int condition, const char* condition_expression, const char* f
     else
     {
         printf("%s:%d FAILED. Expected %s\n", fileName, lineNumber, condition_expression);
+        fflush(stdout);
+        abort();
     }
 }
 
