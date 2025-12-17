@@ -11,12 +11,11 @@ void test1()
 
 int main()
 {
-    cunit_test_func tests[] = { test1, test1, test1 };
-    for (size_t i = 0; i < 3; ++i)
+    cunit_test_t tests[] =
     {
-        printf("============================================\n");
-        cunit_test_func current_test = tests[i];
-        cunit_test(current_test);
-    }
-    printf("============================================\n");
+        { .func = test1, .name = "Arithmetic" },
+        { .func = test1, .name = "Rocket Science" },
+        { .func = test1, .name = "shouldComputeSum" },
+    };
+    cunit_run_tests(tests, 3);
 }
