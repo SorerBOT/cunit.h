@@ -83,6 +83,15 @@ typedef struct
     char* name;
 } cunit_test_t;
 
+void cunit_register_test(cunit_test_func func, char* name)
+{
+    cunit_test_t test = (cunit_test_t)
+    {
+        .func = func,
+        .name = name
+    };
+    
+}
 void cunit_run_test(const cunit_test_t* test)
 {
     pid_t child_process_pid = fork();
