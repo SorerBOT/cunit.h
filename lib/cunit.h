@@ -89,14 +89,14 @@ void cunit_run_test(const cunit_test_t* test)
                 return;
             }
 
-            char error_message[ERROR_MESSAGE_BUFFER];
-            if (strsignal_r(signal, error_message, ERROR_MESSAGE_BUFFER) == 0)
+            char* error_message = strsignal(signal);
+            if (error_message == NULL)
             {
-                printf("Test crashed with the error:\n%s\n", error_message);
+                printf("Test crashed. Failed to find the crash error.\n");
             }
             else
             {
-                printf("Test crashed. Failed to find the crash error.\n");
+                printf("Test crashed with the error:\n%s\n", error_message);
             }
         }
     }
