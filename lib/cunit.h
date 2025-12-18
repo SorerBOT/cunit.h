@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <stdint.h>
 
 #define ERROR_MESSAGE_BUFFER 256
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
