@@ -41,6 +41,27 @@
 
 #define ASSERT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, (threshold))
 #define EXPECT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, (threshold))
+/*
+ *
+ *              void func()
+ *              {
+ *                  ...func code
+ *              }
+ *              (__constructor__)
+ *              void register_func()
+ *              {
+ *                  register(func)
+ *              }
+ *
+ */
+#define CUNIT_TEST(func)                        \
+        void func(void);                        \
+        __attribute__((constructor))            \
+        void register_##func()                  \
+        {                                       \
+            cunit_register_test(func, #func);   \
+        }                                       \
+        void func(void)                         \
 
 long double cunit_fabsl(long double x)
 {
