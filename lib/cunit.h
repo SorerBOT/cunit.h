@@ -22,7 +22,7 @@
 #define ERROR_MESSAGE_BUFFER 256
 
 
-long double fabsl(long double x)
+long double cunit_fabsl(long double x)
 {
     if (x >= 0)
     {
@@ -129,7 +129,7 @@ void cunit_assert_int_eq(intmax_t a, intmax_t b, const char* fileName, int lineN
 
 void cunit_assert_float_eq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold)
 {
-    if (fabsl(a - b) < threshold)
+    if (cunit_fabsl(a - b) < threshold)
     {
         return;
     }
