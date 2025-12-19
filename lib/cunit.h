@@ -51,6 +51,8 @@
         }                                       \
         void func(void)                         \
 
+//#define CUNIT_GET_PAPA(child_address, papa_type, )
+
 long double cunit_fabsl(long double x)
 {
     if (x >= 0)
@@ -70,12 +72,16 @@ typedef struct _linked_list
 {
     struct _linked_list* next_node;
 } linked_list;
-
+ /*
+  * Using intrusive lists, and having the linked_list property
+  * as the first in the struct so that I can cast between
+  * them seemlessly.
+  */
 typedef struct
 {
+    linked_list list_data;
     cunit_test_func func;
     char* name;
-    linked_list list_data;
 } cunit_test_t;
 
 cunit_test_t* tests = NULL;
@@ -180,7 +186,7 @@ void cunit_run_registered_tests()
         }
         else
         {
-            current_test = (cunit_test_t*) (((char*)current_test->list_data.next_node) - sizeof(cunit_test_t) + sizeof(linked_list));
+            current_test = (cunit_test_t*) current_test->list_data.next_node;
         }
     }
     printf("============================================\n");
