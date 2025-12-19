@@ -42,6 +42,17 @@
 #define ASSERT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, (threshold))
 #define EXPECT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, (threshold))
 
+#define CUNIT_TEST(func)                        \
+        void func(void);                        \
+        __attribute__((constructor))            \
+        void register_##func()                  \
+        {                                       \
+            cunit_register_test(func, #func);   \
+        }                                       \
+        void func(void)                         \
+
+//#define CUNIT_GET_PAPA(child_address, papa_type, )
+
 long double cunit_fabsl(long double x)
 {
     if (x >= 0)
@@ -56,11 +67,56 @@ long double cunit_fabsl(long double x)
 }
 
 typedef void(*cunit_test_func)(void);
+
+typedef struct _linked_list
+{
+    struct _linked_list* next_node;
+} linked_list;
+ /*
+  * Using intrusive lists, and having the linked_list property
+  * as the first in the struct so that I can cast between
+  * them seemlessly.
+  */
 typedef struct
 {
+    linked_list list_data;
     cunit_test_func func;
     char* name;
 } cunit_test_t;
+
+cunit_test_t* tests = NULL;
+cunit_test_t* last_test = NULL;
+
+void cunit_register_test(cunit_test_func func, char* name)
+{
+    cunit_test_t* test = malloc(sizeof(cunit_test_t));
+
+    if (test == NULL)
+    {
+        fprintf(stderr, "malloc()");
+        exit(EXIT_FAILURE);
+    }
+
+    *test = (cunit_test_t)
+    {
+        .func = func,
+        .name = name,
+        .list_data = (linked_list)
+        {
+            .next_node = NULL
+        }
+    };
+
+    if (tests == NULL)
+    {
+        tests = test;
+        last_test = test;
+        return;
+    }
+
+    last_test->list_data.next_node = &test->list_data;
+    last_test = test;
+}
 
 void cunit_run_test(const cunit_test_t* test)
 {
@@ -111,6 +167,27 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
         printf("Running test: %s\n", tests[i].name);
         fflush(NULL);
         cunit_run_test(&tests[i]);
+    }
+    printf("============================================\n");
+}
+
+void cunit_run_registered_tests()
+{
+    cunit_test_t* current_test = tests;
+    while (current_test != NULL)
+    {
+        printf("============================================\n");
+        printf("Running test: %s\n", current_test->name);
+        fflush(NULL);
+        cunit_run_test(current_test);
+        if (current_test->list_data.next_node == NULL)
+        {
+            current_test = NULL;
+        }
+        else
+        {
+            current_test = (cunit_test_t*) current_test->list_data.next_node;
+        }
     }
     printf("============================================\n");
 }
