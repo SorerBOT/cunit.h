@@ -180,7 +180,7 @@ void cunit_run_registered_tests()
         }
         else
         {
-            current_test = current_test->list_data.next_node - sizeof(cunit_test_t) + sizeof(linked_list);
+            current_test = (cunit_test_t*) current_test->list_data.next_node - sizeof(cunit_test_t) + sizeof(linked_list);
         }
     }
     printf("============================================\n");
