@@ -82,6 +82,11 @@ void test_float_lower()
     ASSERT_FLOAT_LOWER(x, w);
 }
 
+CUNIT_TEST(test_hello_world)
+{
+    printf("Hello world\n");
+}
+
 int main()
 {
     cunit_test_t tests[] =
@@ -95,5 +100,6 @@ int main()
         { .func = test_int_lower, .name = "test int lower"},
         { .func = test_float_lower, .name = "test float lower"},
     };
-    cunit_run_tests(tests, 8);
+    //cunit_run_tests(tests, 8);
+    cunit_run_registered_tests();
 }
