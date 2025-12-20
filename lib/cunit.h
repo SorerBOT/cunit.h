@@ -51,8 +51,6 @@
         }                                       \
         void func(void)                         \
 
-//#define CUNIT_GET_PAPA(child_address, papa_type, )
-
 long double cunit_fabsl(long double x)
 {
     if (x >= 0)
@@ -63,7 +61,6 @@ long double cunit_fabsl(long double x)
     {
         return -x;
     }
-
 }
 
 typedef void(*cunit_func_t)(void);
