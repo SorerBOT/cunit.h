@@ -68,10 +68,10 @@ long double cunit_fabsl(long double x)
 
 typedef void(*cunit_test_func)(void);
 
-typedef struct _linked_list
+typedef struct _cunit_linked_list_t
 {
-    struct _linked_list* next_node;
-} linked_list;
+    struct _cunit_linked_list_t* next_node;
+} cunit_linked_list_t;
  /*
   * Using intrusive lists, and having the linked_list property
   * as the first in the struct so that I can cast between
@@ -79,7 +79,7 @@ typedef struct _linked_list
   */
 typedef struct
 {
-    linked_list list_data;
+    cunit_linked_list_t list_data;
     cunit_test_func func;
     char* name;
 } cunit_test_t;
@@ -101,7 +101,7 @@ void cunit_register_test(cunit_test_func func, char* name)
     {
         .func = func,
         .name = name,
-        .list_data = (linked_list)
+        .list_data = (cunit_linked_list_t)
         {
             .next_node = NULL
         }
