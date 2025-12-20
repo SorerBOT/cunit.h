@@ -42,14 +42,23 @@
 #define ASSERT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, (threshold))
 #define EXPECT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, (threshold))
 
-#define CUNIT_TEST(func)                        \
-        void func(void);                        \
+#define CUNIT_TEST(func)                                    \
+        void _cunit_test_##func(void);                      \
+        __attribute__((constructor))                        \
+        void _cunit_register_##func()                       \
+        {                                                   \
+            cunit_register_test(_cunit_test_##func, #func); \
+        }                                                   \
+        void _cunit_test_##func(void)                       \
+
+#define CUNIT_SETUP()                           \
+        void _cunit_setup(void);                \
         __attribute__((constructor))            \
-        void register_##func()                  \
+        void _cunit_register_setup()            \
         {                                       \
-            cunit_register_test(func, #func);   \
+            cunit_register_setup(_cunit_setup); \
         }                                       \
-        void func(void)                         \
+        void _cunit_setup(void)                 \
 
 long double cunit_fabsl(long double x)
 {
@@ -83,6 +92,7 @@ typedef struct
 
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
+cunit_func_t setup_func = NULL;
 
 void cunit_register_test(cunit_func_t func, char* name)
 {
@@ -115,8 +125,19 @@ void cunit_register_test(cunit_func_t func, char* name)
     last_test = test;
 }
 
+void cunit_register_setup(cunit_func_t func)
+{
+    if (setup_func != NULL)
+    {
+        fprintf(stderr, "setup function redefinition is not allowed.\n");
+        exit(EXIT_FAILURE);
+    }
+    setup_func = func;
+}
 void cunit_run_test(const cunit_test_t* test)
 {
+    setup_func();
+
     pid_t child_process_pid = fork();
     if (child_process_pid == -1)
     {

@@ -165,6 +165,10 @@ CUNIT_TEST(float_lower)
     ASSERT_FLOAT_LOWER(x, w);
 }
 
+CUNIT_SETUP()
+{
+    printf("Preparing DB mock for test....\n");
+}
 int main()
 {
     cunit_test_t tests[] =
