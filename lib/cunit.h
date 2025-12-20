@@ -194,6 +194,27 @@ void cunit_register_cleanup_onetime(cunit_func_t func)
     cleanup_onetime_func = func;
 }
 
+__attribute__((destructor))
+void cunit_free_tests()
+{
+    cunit_test_t* test_previous = tests;
+    cunit_test_t* test_current = tests;
+
+    while (test_current != NULL)
+    {
+        if (test_current->list_data.next_node == NULL)
+        {
+            test_current = NULL;
+        }
+        else
+        {
+            test_current = (cunit_test_t*) test_current->list_data.next_node;
+        }
+        free(test_previous);
+        test_previous = test_current;
+    }
+}
+
 void cunit_run_test(const cunit_test_t* test)
 {
     /*
