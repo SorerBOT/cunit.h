@@ -1,5 +1,5 @@
 # cunit.h
-Like JUnit, but tiny, and written in C for C development.
+Like NUnit or JUnit, but tiny, and written in C for C development.
 
 
 ## How does it work?
