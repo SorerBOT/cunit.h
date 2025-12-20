@@ -199,4 +199,6 @@ int main()
 #else
     cunit_run_tests(tests, 8);
 #endif
+
+    cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
 }
