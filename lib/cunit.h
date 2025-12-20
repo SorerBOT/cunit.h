@@ -58,7 +58,7 @@
         {                                       \
             cunit_register_setup(_cunit_setup); \
         }                                       \
-        void _cunit_setup(void)                 \
+        void _cunit_setup(void)
 
 #define CUNIT_CLEANUP()                             \
         void _cunit_cleanup(void);                  \
@@ -67,8 +67,25 @@
         {                                           \
             cunit_register_cleanup(_cunit_cleanup); \
         }                                           \
-        void _cunit_cleanup(void)                   \
+        void _cunit_cleanup(void)
 
+#define CUNIT_SETUP_ONETIME()                                   \
+        void _cunit_setup_onetime(void);                        \
+        __attribute__((constructor))                            \
+        void _cunit_register_setup_onetime()                    \
+        {                                                       \
+            cunit_register_setup_onetime(_cunit_setup_onetime); \
+        }                                                       \
+        void _cunit_setup_onetime(void)
+
+#define CUNIT_CLEANUP_ONETIME()                     \
+        void _cunit_cleanup_onetime(void);                  \
+        __attribute__((constructor))                \
+        void _cunit_register_cleanup_onetime()              \
+        {                                           \
+            cunit_register_cleanup_onetime(_cunit_cleanup_onetime); \
+        }                                           \
+        void _cunit_cleanup_onetime(void)
 long double cunit_fabsl(long double x)
 {
     if (x >= 0)
@@ -103,6 +120,8 @@ cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
 cunit_func_t setup_func = NULL;
 cunit_func_t cleanup_func = NULL;
+cunit_func_t setup_onetime_func = NULL;
+cunit_func_t cleanup_onetime_func = NULL;
 
 void cunit_register_test(cunit_func_t func, char* name)
 {
@@ -154,6 +173,27 @@ void cunit_register_cleanup(cunit_func_t func)
     }
     cleanup_func = func;
 }
+
+void cunit_register_setup_onetime(cunit_func_t func)
+{
+    if (setup_onetime_func != NULL)
+    {
+        fprintf(stderr, "setup_onetime function redefinition is not allowed.\n");
+        exit(EXIT_FAILURE);
+    }
+    setup_onetime_func = func;
+}
+
+void cunit_register_cleanup_onetime(cunit_func_t func)
+{
+    if (cleanup_onetime_func != NULL)
+    {
+        fprintf(stderr, "cleanup_onetime function redefinition is not allowed.\n");
+        exit(EXIT_FAILURE);
+    }
+    cleanup_onetime_func = func;
+}
+
 void cunit_run_test(const cunit_test_t* test)
 {
     /*
@@ -223,6 +263,13 @@ void cunit_run_test(const cunit_test_t* test)
 
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
 {
+    /*
+     * SetUpOneTime
+     */
+    printf("**** Running SetUpOneTime function....\n");
+    setup_onetime_func();
+    printf("**** SetUpOneTime function finished successfully....\n");
+
     for (size_t i = 0; i < tests_count; ++i)
     {
         printf("============================================\n");
@@ -231,10 +278,24 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
         cunit_run_test(&tests[i]);
     }
     printf("============================================\n");
+
+    /*
+     * CleanUpOneTime
+     */
+    printf("**** Running CleanUpOneTime function....\n");
+    cleanup_onetime_func();
+    printf("**** CleanUpOneTime function finished successfully....\n");
 }
 
 void cunit_run_registered_tests()
 {
+    /*
+     * SetUpOneTime
+     */
+    printf("**** Running SetUpOneTime function....\n");
+    setup_onetime_func();
+    printf("**** SetUpOneTime function finished successfully....\n");
+
     cunit_test_t* current_test = tests;
     while (current_test != NULL)
     {
@@ -252,6 +313,13 @@ void cunit_run_registered_tests()
         }
     }
     printf("============================================\n");
+
+    /*
+     * CleanUpOneTime
+     */
+    printf("**** Running CleanUpOneTime function....\n");
+    cleanup_onetime_func();
+    printf("**** CleanUpOneTime function finished successfully....\n");
 }
 
 void cunit_assert(int condition, const char* condition_expression,
