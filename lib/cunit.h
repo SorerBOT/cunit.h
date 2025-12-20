@@ -213,6 +213,8 @@ void cunit_free_tests()
         free(test_previous);
         test_previous = test_current;
     }
+
+    tests = NULL;
 }
 
 void cunit_run_test(const cunit_test_t* test)
