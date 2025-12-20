@@ -66,7 +66,7 @@ long double cunit_fabsl(long double x)
 
 }
 
-typedef void(*cunit_test_func)(void);
+typedef void(*cunit_func_t)(void);
 
 typedef struct _cunit_linked_list_t
 {
@@ -80,14 +80,14 @@ typedef struct _cunit_linked_list_t
 typedef struct
 {
     cunit_linked_list_t list_data;
-    cunit_test_func func;
+    cunit_func_t func;
     char* name;
 } cunit_test_t;
 
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
 
-void cunit_register_test(cunit_test_func func, char* name)
+void cunit_register_test(cunit_func_t func, char* name)
 {
     cunit_test_t* test = malloc(sizeof(cunit_test_t));
 
