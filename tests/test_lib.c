@@ -165,6 +165,22 @@ CUNIT_TEST(float_lower)
     ASSERT_FLOAT_LOWER(x, w);
 }
 
+CUNIT_SETUP_ONETIME()
+{
+    printf("Establish connection to DB....\n");
+}
+CUNIT_CLEANUP_ONETIME()
+{
+    printf("Terminate connection to DB....\n");
+}
+CUNIT_SETUP()
+{
+    printf("Create DB entries for test....\n");
+}
+CUNIT_CLEANUP()
+{
+    printf("Delete DB after test....\n");
+}
 int main()
 {
     cunit_test_t tests[] =
