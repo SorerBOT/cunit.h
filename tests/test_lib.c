@@ -167,7 +167,11 @@ CUNIT_TEST(float_lower)
 
 CUNIT_SETUP()
 {
-    printf("Preparing DB mock for test....\n");
+    printf("Create DB entries for test....\n");
+}
+CUNIT_CLEANUP()
+{
+    printf("Delete DB after test....\n");
 }
 int main()
 {

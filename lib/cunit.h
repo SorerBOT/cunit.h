@@ -60,6 +60,15 @@
         }                                       \
         void _cunit_setup(void)                 \
 
+#define CUNIT_CLEANUP()                             \
+        void _cunit_cleanup(void);                  \
+        __attribute__((constructor))                \
+        void _cunit_register_cleanup()              \
+        {                                           \
+            cunit_register_cleanup(_cunit_cleanup); \
+        }                                           \
+        void _cunit_cleanup(void)                   \
+
 long double cunit_fabsl(long double x)
 {
     if (x >= 0)
@@ -93,6 +102,7 @@ typedef struct
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
 cunit_func_t setup_func = NULL;
+cunit_func_t cleanup_func = NULL;
 
 void cunit_register_test(cunit_func_t func, char* name)
 {
@@ -134,10 +144,33 @@ void cunit_register_setup(cunit_func_t func)
     }
     setup_func = func;
 }
+
+void cunit_register_cleanup(cunit_func_t func)
+{
+    if (cleanup_func != NULL)
+    {
+        fprintf(stderr, "cleanup function redefinition is not allowed.\n");
+        exit(EXIT_FAILURE);
+    }
+    cleanup_func = func;
+}
 void cunit_run_test(const cunit_test_t* test)
 {
-    setup_func();
+    /*
+     * SETUP
+     */
+    if (setup_func != NULL)
+    {
+        printf("**** Running SetUp function....\n");
+        fflush(NULL);
+        setup_func();
+        printf("**** SetUp finished successfully....\n");
+        fflush(NULL);
+    }
 
+    /*
+     * Running Test
+     */
     pid_t child_process_pid = fork();
     if (child_process_pid == -1)
     {
@@ -161,18 +194,29 @@ void cunit_run_test(const cunit_test_t* test)
             int signal = WTERMSIG(stat_loc);
             if (signal == SIGABRT)
             {
-                return;
-            }
-
-            char* error_message = strsignal(signal);
-            if (error_message == NULL)
-            {
-                printf("Test crashed. Failed to find the crash error.\n");
             }
             else
             {
-                printf("Test crashed with the error:\n%s\n", error_message);
+                char* error_message = strsignal(signal);
+                if (error_message == NULL)
+                {
+                    printf("Test crashed. Failed to find the crash error.\n");
+                }
+                else
+                {
+                    printf("Test crashed with the error:\n%s\n", error_message);
+                }
             }
+        }
+        /*
+         * Clean Up
+         */
+        if (cleanup_func != NULL)
+        {
+            printf("**** Running CleanUp function....\n");
+            fflush(NULL);
+            cleanup_func();
+            printf("**** CleanUp finished successfully....\n");
         }
     }
 }
