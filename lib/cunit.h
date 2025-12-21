@@ -43,10 +43,14 @@
 #define CUNIT_EXPECT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, (threshold))
 
 #define CUNIT_ASSERT_STR_EQ(a,b) cunit_assert_str_eq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_STR_EQ(a,b) cunit_assert_str_eq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_EQ(a,b) cunit_assert_str_eq((a), (b), __FILE__, __LINE__, 0)
 
 #define CUNIT_ASSERT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 0)
+
 
 #define CUNIT_TEST(func)                                    \
         void _cunit_test_##func(void);                      \
@@ -496,6 +500,22 @@ void cunit_assert_str_neq(const char* a, const char* b,
         return;
     }
     printf("%s:%d FAILED. Expected %s != %s\n", fileName, lineNumber, a, b);
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_str_contains(const char* a, const char* b,
+                        char* fileName, int lineNumber,
+                        int shouldAbort)
+{
+    if (strstr(a, b) != NULL)
+    {
+        return;
+    }
+    printf("%s:%d FAILED. Expected %s == %s\n", fileName, lineNumber, a, b);
     if (shouldAbort)
     {
         fflush(stdout);
