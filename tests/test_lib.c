@@ -172,6 +172,10 @@ CUNIT_TEST(str_eq_neq)
     CUNIT_ASSERT_STR_NEQ("Mammoth", "Breathalyzer");
     CUNIT_ASSERT_STR_NEQ("Mammoth", "Bimba");
     CUNIT_ASSERT_STR_NEQ("Mammoth", "Bimba");
+    CUNIT_EXPECT_STR_NEQ(NULL, "Bimba");
+    CUNIT_EXPECT_STR_NEQ(NULL, NULL);
+    CUNIT_EXPECT_STR_EQ(NULL, "Bimba");
+    CUNIT_EXPECT_STR_EQ(NULL, NULL);
     CUNIT_ASSERT_STR_EQ("Mammoth", "Guacamole");
 }
 
@@ -179,6 +183,8 @@ CUNIT_TEST(str_contains)
 {
     char* a = "Hello World";
     char* b = "World";
+    CUNIT_EXPECT_STR_CONTAINS(NULL, "Bimba");
+    CUNIT_EXPECT_STR_CONTAINS(NULL, NULL);
     CUNIT_ASSERT_STR_CONTAINS(a, b);
     CUNIT_ASSERT_STR_CONTAINS(b, a);
 }

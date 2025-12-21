@@ -482,11 +482,17 @@ void cunit_assert_str_eq(const char* a, const char* b,
                         char* fileName, int lineNumber,
                         int shouldAbort)
 {
-    if (strcmp(a, b) == 0)
+    const char* c = (a == NULL) ? "NULL" : a;
+    const char* d = (b == NULL) ? "NULL" : b;
+
+    if ( !(a == NULL || b == NULL) )
     {
-        return;
+        if (strcmp(a, b) == 0)
+        {
+            return;
+        }
     }
-    printf("%s:%d FAILED. Expected %s == %s\n", fileName, lineNumber, a, b);
+    printf("%s:%d FAILED. Expected %s == %s\n", fileName, lineNumber, c, d);
     if (shouldAbort)
     {
         fflush(stdout);
@@ -498,11 +504,18 @@ void cunit_assert_str_neq(const char* a, const char* b,
                         char* fileName, int lineNumber,
                         int shouldAbort)
 {
-    if (strcmp(a, b) != 0)
+    const char* c = (a == NULL) ? "NULL" : a;
+    const char* d = (b == NULL) ? "NULL" : b;
+
+    if ( !(a == NULL || b == NULL) )
     {
-        return;
+        // Cannot compare them!
+        if (strcmp(a, b) != 0)
+        {
+            return;
+        }
     }
-    printf("%s:%d FAILED. Expected %s != %s\n", fileName, lineNumber, a, b);
+    printf("%s:%d FAILED. Expected %s != %s\n", fileName, lineNumber, c, d);
     if (shouldAbort)
     {
         fflush(stdout);
@@ -514,11 +527,16 @@ void cunit_assert_str_contains(const char* a, const char* b,
                         char* fileName, int lineNumber,
                         int shouldAbort)
 {
-    if (strstr(a, b) != NULL)
+    const char* c = (a == NULL) ? "NULL" : a;
+    const char* d = (b == NULL) ? "NULL" : b;
+    if ( !(a == NULL || b == NULL) )
     {
-        return;
+        if (strstr(a, b) != NULL)
+        {
+            return;
+        }
     }
-    printf("%s:%d FAILED. Expected \"%s\" to contain \"%s\"\n", fileName, lineNumber, a, b);
+    printf("%s:%d FAILED. Expected %s to contain %s\n", fileName, lineNumber, c, d);
     if (shouldAbort)
     {
         fflush(stdout);
