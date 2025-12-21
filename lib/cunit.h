@@ -48,6 +48,12 @@
 #define CUNIT_ASSERT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 0)
 
+/*
+ * assert that a contains b
+ */
+#define CUNIT_ASSERT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 0)
+
 #define CUNIT_ASSERT_PTR_EQ(a,b) cunit_assert_ptr_eq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_PTR_EQ(a,b) cunit_assert_ptr_eq((a), (b), __FILE__, __LINE__, 0)
 
@@ -56,12 +62,9 @@
 
 #define CUNIT_ASSERT_PTR_NULL(a) cunit_assert_ptr_null((a), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_PTR_NULL(a) cunit_assert_ptr_null((a), __FILE__, __LINE__, 0)
-/*
- * assert that a contains b
- */
-#define CUNIT_ASSERT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 0)
 
+#define CUNIT_ASSERT_PTR_NOT_NULL(a) cunit_assert_ptr_not_null((a), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_PTR_NOT_NULL(a) cunit_assert_ptr_not_null((a), __FILE__, __LINE__, 0)
 
 #define CUNIT_TEST(func)                                    \
         void _cunit_test_##func(void);                      \
@@ -615,6 +618,23 @@ void cunit_assert_ptr_null(const void* a, const char* fileName,
     }
 
     printf("%s:%d FAILED. Expected pointer to be NULL, but got %p\n", fileName, lineNumber, a);
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_ptr_not_null(const void* a, const char* fileName,
+                            int lineNumber, int shouldAbort)
+{
+    if (a != NULL)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected valid pointer, but got NULL\n", fileName, lineNumber);
 
     if (shouldAbort)
     {
