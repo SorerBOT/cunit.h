@@ -198,6 +198,15 @@ CUNIT_TEST(ptr_eq)
     CUNIT_ASSERT_PTR_EQ(a, c);
 }
 
+CUNIT_TEST(ptr_neq)
+{
+    char* a = malloc(strlen("Hello World"));
+    char* b = malloc(strlen("Hello World"));
+    char* c = NULL;
+    CUNIT_ASSERT_PTR_NEQ(a, b);
+    CUNIT_ASSERT_PTR_EQ(a, c);
+}
+
 CUNIT_SETUP_ONETIME()
 {
     printf("Establish connection to DB....\n");
