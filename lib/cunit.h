@@ -48,6 +48,9 @@
 #define CUNIT_ASSERT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 0)
 
+/*
+ * assert that a contains b
+ */
 #define CUNIT_ASSERT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 0)
 
@@ -515,7 +518,7 @@ void cunit_assert_str_contains(const char* a, const char* b,
     {
         return;
     }
-    printf("%s:%d FAILED. Expected %s == %s\n", fileName, lineNumber, a, b);
+    printf("%s:%d FAILED. Expected \"%s\" to contain \"%s\"\n", fileName, lineNumber, a, b);
     if (shouldAbort)
     {
         fflush(stdout);

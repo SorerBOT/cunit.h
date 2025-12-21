@@ -175,6 +175,14 @@ CUNIT_TEST(str_eq_neq)
     CUNIT_ASSERT_STR_EQ("Mammoth", "Guacamole");
 }
 
+CUNIT_TEST(str_contains)
+{
+    char* a = "Hello World";
+    char* b = "World";
+    CUNIT_ASSERT_STR_CONTAINS(a, b);
+    CUNIT_ASSERT_STR_CONTAINS(b, a);
+}
+
 CUNIT_SETUP_ONETIME()
 {
     printf("Establish connection to DB....\n");
