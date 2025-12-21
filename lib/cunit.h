@@ -53,6 +53,9 @@
 
 #define CUNIT_ASSERT_PTR_NEQ(a,b) cunit_assert_ptr_neq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_PTR_NEQ(a,b) cunit_assert_ptr_neq((a), (b), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_PTR_NULL(a) cunit_assert_ptr_null((a), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_PTR_NULL(a) cunit_assert_ptr_null((a), __FILE__, __LINE__, 0)
 /*
  * assert that a contains b
  */
@@ -549,7 +552,7 @@ void cunit_assert_str_contains(const char* a, const char* b,
     }
 }
 
-void cunit_assert_ptr_eq(void* a, void* b,
+void cunit_assert_ptr_eq(const void* a, const void* b,
                             const char* fileName, int lineNumber,
                             int shouldAbort)
 {
@@ -576,7 +579,7 @@ void cunit_assert_ptr_eq(void* a, void* b,
     }
 }
 
-void cunit_assert_ptr_neq(void* a, void* b,
+void cunit_assert_ptr_neq(const void* a, const void* b,
                             const char* fileName, int lineNumber,
                             int shouldAbort)
 {
@@ -595,6 +598,23 @@ void cunit_assert_ptr_neq(void* a, void* b,
     {
         printf("%s:%d FAILED. Expected equal addresses, but got NULL in at least one of them\n", fileName, lineNumber);
     }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_ptr_null(const void* a, const char* fileName,
+                            int lineNumber, int shouldAbort)
+{
+    if (a == NULL)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected pointer to be NULL, but got %p\n", fileName, lineNumber, a);
 
     if (shouldAbort)
     {
