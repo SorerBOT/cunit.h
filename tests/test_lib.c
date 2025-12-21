@@ -165,6 +165,16 @@ CUNIT_TEST(float_lower)
     CUNIT_ASSERT_FLOAT_LOWER(x, w);
 }
 
+CUNIT_TEST(str_eq_neq)
+{
+    CUNIT_ASSERT_STR_EQ("Hello World", "Hello World");
+    CUNIT_ASSERT_STR_NEQ("Hello Worlld", "Breathalyzer");
+    CUNIT_ASSERT_STR_NEQ("Mammoth", "Breathalyzer");
+    CUNIT_ASSERT_STR_NEQ("Mammoth", "Bimba");
+    CUNIT_ASSERT_STR_NEQ("Mammoth", "Bimba");
+    CUNIT_ASSERT_STR_EQ("Mammoth", "Guacamole");
+}
+
 CUNIT_SETUP_ONETIME()
 {
     printf("Establish connection to DB....\n");

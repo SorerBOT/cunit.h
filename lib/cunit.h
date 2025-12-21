@@ -479,7 +479,7 @@ void cunit_assert_str_eq(const char* a, const char* b,
     {
         return;
     }
-    printf("%s:%d FAILED. Expected %s < %s\n", fileName, lineNumber, a, b);
+    printf("%s:%d FAILED. Expected %s == %s\n", fileName, lineNumber, a, b);
     if (shouldAbort)
     {
         fflush(stdout);
@@ -495,7 +495,7 @@ void cunit_assert_str_neq(const char* a, const char* b,
     {
         return;
     }
-    printf("%s:%d FAILED. Expected %s < %s\n", fileName, lineNumber, a, b);
+    printf("%s:%d FAILED. Expected %s != %s\n", fileName, lineNumber, a, b);
     if (shouldAbort)
     {
         fflush(stdout);
