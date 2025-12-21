@@ -48,6 +48,8 @@
 #define CUNIT_ASSERT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 0)
 
+#define CUNIT_ASSERT_PTR_EQ(a,b) cunit_assert_ptr_eq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_PTR_EQ(a,b) cunit_assert_ptr_eq((a), (b), __FILE__, __LINE__, 0)
 /*
  * assert that a contains b
  */
@@ -537,6 +539,33 @@ void cunit_assert_str_contains(const char* a, const char* b,
         }
     }
     printf("%s:%d FAILED. Expected %s to contain %s\n", fileName, lineNumber, c, d);
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_ptr_eq(void* a, void* b,
+                            const char* fileName, int lineNumber,
+                            int shouldAbort)
+{
+    if ( !(a == NULL || b == NULL) )
+    {
+        if (a == b)
+        {
+            return;
+        }
+        else
+        {
+            printf("%s:%d FAILED. Expected %p == %p\n", fileName, lineNumber, a, b);
+        }
+    }
+    else
+    {
+        printf("%s:%d FAILED. Expected equal addresses, but got NULL in at least one of them\n", fileName, lineNumber);
+    }
+
     if (shouldAbort)
     {
         fflush(stdout);
