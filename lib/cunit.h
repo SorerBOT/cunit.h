@@ -12,35 +12,41 @@
 #define ERROR_MESSAGE_BUFFER 256
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
 
-#define ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 1)
-#define EXPECT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 0)
 
-#define ASSERT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 1)
-#define EXPECT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 0)
 
-#define ASSERT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
-#define EXPECT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_ASSERT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
-#define ASSERT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, (threshold))
-#define EXPECT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, (threshold))
+#define CUNIT_ASSERT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, (threshold))
+#define CUNIT_EXPECT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, (threshold))
 
-#define ASSERT_INT_LEQ(a,b) cunit_assert_int_leq((a), (b), __FILE__, __LINE__, 1)
-#define EXPECT_INT_LEQ(a,b) cunit_assert_int_leq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_INT_LEQ(a,b) cunit_assert_int_leq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_INT_LEQ(a,b) cunit_assert_int_leq((a), (b), __FILE__, __LINE__, 0)
 
-#define ASSERT_FLOAT_LEQ(a,b) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
-#define EXPECT_FLOAT_LEQ(a,b) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_ASSERT_FLOAT_LEQ(a,b) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_LEQ(a,b) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
-#define ASSERT_FLOAT_LEQ_THRESHOLD(a,b, threshold) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 1, (threshold))
-#define EXPECT_FLOAT_LEQ_THRESHOLD(a,b, threshold) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 0, (threshold))
+#define CUNIT_ASSERT_FLOAT_LEQ_THRESHOLD(a,b, threshold) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 1, (threshold))
+#define CUNIT_EXPECT_FLOAT_LEQ_THRESHOLD(a,b, threshold) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 0, (threshold))
 
-#define ASSERT_INT_LOWER(a,b) cunit_assert_int_lower((a), (b), __FILE__, __LINE__, 1)
-#define EXPECT_INT_LOWER(a,b) cunit_assert_int_lower((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_INT_LOWER(a,b) cunit_assert_int_lower((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_INT_LOWER(a,b) cunit_assert_int_lower((a), (b), __FILE__, __LINE__, 0)
 
-#define ASSERT_FLOAT_LOWER(a,b) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
-#define EXPECT_FLOAT_LOWER(a,b) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_ASSERT_FLOAT_LOWER(a,b) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_LOWER(a,b) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
-#define ASSERT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, (threshold))
-#define EXPECT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, (threshold))
+#define CUNIT_ASSERT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, (threshold))
+#define CUNIT_EXPECT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, (threshold))
+
+#define CUNIT_ASSERT_STR_EQ(a,b) cunit_assert_str_eq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_EQ(a,b) cunit_assert_str_eq((a), (b), __FILE__, __LINE__, 1)
+
+#define CUNIT_ASSERT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
 
 #define CUNIT_TEST(func)                                    \
         void _cunit_test_##func(void);                      \
@@ -465,4 +471,35 @@ void cunit_assert_float_lower(long double a, long double b,
     }
 }
 
+void cunit_assert_str_eq(const char* a, const char* b,
+                        char* fileName, int lineNumber,
+                        int shouldAbort)
+{
+    if (strcmp(a, b) == 0)
+    {
+        return;
+    }
+    printf("%s:%d FAILED. Expected %s < %s\n", fileName, lineNumber, a, b);
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_str_neq(const char* a, const char* b,
+                        char* fileName, int lineNumber,
+                        int shouldAbort)
+{
+    if (strcmp(a, b) != 0)
+    {
+        return;
+    }
+    printf("%s:%d FAILED. Expected %s < %s\n", fileName, lineNumber, a, b);
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
 #endif /* CUNIT_H */
