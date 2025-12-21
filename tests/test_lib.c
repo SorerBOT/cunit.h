@@ -101,6 +101,15 @@ CUNIT_TEST(int_eq)
     CUNIT_ASSERT_INT_EQ(1+2, 2);
 }
 
+CUNIT_TEST(int_neq)
+{
+    CUNIT_EXPECT_INT_NEQ(1+2, 2);
+    CUNIT_EXPECT_INT_NEQ(1+2, 2);
+    CUNIT_ASSERT_INT_NEQ(1+2, 2);
+    CUNIT_ASSERT_INT_NEQ(1+2, 2);
+    CUNIT_ASSERT_INT_NEQ(2, 2);
+}
+
 CUNIT_TEST(crash)
 {
     raise(SIGSEGV);

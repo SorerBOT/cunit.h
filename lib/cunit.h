@@ -18,6 +18,9 @@
 #define CUNIT_ASSERT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 0)
 
+#define CUNIT_ASSERT_INT_NEQ(a,b) cunit_assert_int_neq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_INT_NEQ(a,b) cunit_assert_int_neq((a), (b), __FILE__, __LINE__, 0)
+
 #define CUNIT_ASSERT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
 #define CUNIT_EXPECT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
@@ -407,6 +410,24 @@ void cunit_assert_int_eq(intmax_t a, intmax_t b,
     }
 }
 
+void cunit_assert_int_neq(intmax_t a, intmax_t b,
+                            const char* fileName, int lineNumber,
+                            int shouldAbort)
+{
+    if (a != b)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected %jd != %jd\n", fileName, lineNumber, a, b);
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
 void cunit_assert_float_eq(long double a, long double b,
                             const char* fileName, int lineNumber,
                             int shouldAbort, long double threshold)
@@ -594,7 +615,7 @@ void cunit_assert_ptr_neq(const void* a, const void* b,
         }
         else
         {
-            printf("%s:%d FAILED. Expected %p == %p\n", fileName, lineNumber, a, b);
+            printf("%s:%d FAILED. Expected %p != %p\n", fileName, lineNumber, a, b);
         }
     }
     else
