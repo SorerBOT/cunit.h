@@ -156,6 +156,9 @@ typedef struct
 
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
+size_t tests_count = 0;
+size_t tests_count_passed = 0;
+
 cunit_func_t setup_func = NULL;
 cunit_func_t cleanup_func = NULL;
 cunit_func_t setup_onetime_func = NULL;
@@ -170,7 +173,7 @@ void cunit_register_test(cunit_func_t func, char* name)
         fprintf(stderr, "malloc()");
         exit(EXIT_FAILURE);
     }
-
+    ++tests_count;
     *test = (cunit_test_t)
     {
         .func = func,
@@ -289,6 +292,7 @@ void cunit_run_test(const cunit_test_t* test)
         waitpid(child_process_pid, &stat_loc, 0);
         if (WIFEXITED(stat_loc))
         {
+            ++tests_count_passed;
         }
         else if (WIFSIGNALED(stat_loc))
         {
@@ -324,6 +328,7 @@ void cunit_run_test(const cunit_test_t* test)
 
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
 {
+    tests_count_passed = 0;
     /*
      * SetUpOneTime
      */
@@ -352,6 +357,7 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
 
 void cunit_run_registered_tests()
 {
+    tests_count_passed = 0;
     /*
      * SetUpOneTime
      */
@@ -383,6 +389,16 @@ void cunit_run_registered_tests()
     printf("**** Running CleanUpOneTime function....\n");
     cleanup_onetime_func();
     printf("**** CleanUpOneTime function finished successfully....\n");
+
+    /*
+     * Printing Statistical Data
+     */
+    if (tests_count_passed == tests_count)
+    {
+        printf("All tests PASSED!");
+        return;
+    }
+    printf("\n%lu tests failed out of %lu tests in total\n", tests_count - tests_count_passed, tests_count);
 }
 
 void cunit_assert_true(int condition, const char* condition_expression,
