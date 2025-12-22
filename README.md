@@ -1,7 +1,37 @@
 # cunit.h
 Like NUnit or JUnit, but tiny, and written in C for C development.
 
-
+## How do I use it?
+Create a **single** tests file. Use the `CUNIT_TEST`, `CUNIT_SETUP`, `CUNIT_CLEANUP`, `CUNIT_SETUP_ONETIME`, `CUNIT_CLEANUP_ONETIME` in order to add tests, a per-test setup function, a per-test cleanup function, a general--one time setup function, and a general--one time cleanup funciton. Here is how a complete testing suite might look:
+```c
+CUNIT_SETUP_ONETIME()
+{
+    printf("Establish connection to DB....\n");
+}
+CUNIT_CLEANUP_ONETIME()
+{
+    printf("Terminate connection to DB....\n");
+}
+CUNIT_SETUP()
+{
+    printf("Create DB entries for test....\n");
+}
+CUNIT_CLEANUP()
+{
+    printf("Delete DB after test....\n");
+}
+CUNIT_TEST(str_eq)
+{
+    CUNIT_ASSERT_STR_EQ("Hello World", "Hello World");
+    CUNIT_EXPECT_STR_NEQ(NULL, "Bimba");
+    CUNIT_EXPECT_STR_NEQ(NULL, NULL);
+}
+int main()
+{
+    cunit_run_registered_tests();
+    cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
+}
+```
 ## How does it work?
 
 ### Test Registration
