@@ -359,6 +359,16 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
         cleanup_onetime_func();
         printf("**** CleanUpOneTime function finished successfully....\n");
     }
+
+    /*
+     * Printing Statistical Data
+     */
+    if (tests_count_passed == tests_count)
+    {
+        printf("All tests PASSED!");
+        return;
+    }
+    printf("\n%lu tests failed out of %lu tests in total\n", tests_count - tests_count_passed, tests_count);
 }
 
 void cunit_run_registered_tests()
@@ -367,9 +377,13 @@ void cunit_run_registered_tests()
     /*
      * SetUpOneTime
      */
-    printf("**** Running SetUpOneTime function....\n");
-    setup_onetime_func();
-    printf("**** SetUpOneTime function finished successfully....\n");
+    if (setup_onetime_func != NULL)
+    {
+        printf("**** Running SetUpOneTime function....\n");
+        fflush(NULL);
+        setup_onetime_func();
+        printf("**** SetUpOneTime function finished successfully....\n");
+    }
 
     cunit_test_t* current_test = tests;
     while (current_test != NULL)
@@ -392,9 +406,14 @@ void cunit_run_registered_tests()
     /*
      * CleanUpOneTime
      */
-    printf("**** Running CleanUpOneTime function....\n");
-    cleanup_onetime_func();
-    printf("**** CleanUpOneTime function finished successfully....\n");
+    if (cleanup_onetime_func != NULL)
+    {
+
+        printf("**** Running CleanUpOneTime function....\n");
+        fflush(NULL);
+        cleanup_onetime_func();
+        printf("**** CleanUpOneTime function finished successfully....\n");
+    }
 
     /*
      * Printing Statistical Data
