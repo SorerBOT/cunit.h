@@ -7,10 +7,10 @@
 void test_bool()
 {
     int x = 1, y = 2;
-    CUNIT_EXPECT(x+y == y);
-    CUNIT_EXPECT(x+y == y);
-    CUNIT_ASSERT(x+y == y);
-    CUNIT_ASSERT(x+y == y);
+    CUNIT_EXPECT_TRUE(x+y == y);
+    CUNIT_EXPECT_TRUE(x+y == y);
+    CUNIT_ASSERT_TRUE(x+y == y);
+    CUNIT_ASSERT_TRUE(x+y == y);
 }
 void test_int_eq()
 {
@@ -84,13 +84,22 @@ void test_float_lower()
     CUNIT_ASSERT_FLOAT_LOWER(x, w);
 }
 
-CUNIT_TEST(Arithmetic)
+CUNIT_TEST(assert_true)
 {
     int x = 1, y = 2;
-    CUNIT_EXPECT(x+y == y);
-    CUNIT_EXPECT(x+y == y);
-    CUNIT_ASSERT(x+y == y);
-    CUNIT_ASSERT(x+y == y);
+    CUNIT_EXPECT_TRUE(x+y == y);
+    CUNIT_EXPECT_TRUE(x+y == y);
+    CUNIT_ASSERT_TRUE(x+y == y);
+    CUNIT_ASSERT_TRUE(x+y == y);
+}
+
+CUNIT_TEST(assert_false)
+{
+    int x = 1, y = 2;
+    CUNIT_EXPECT_FALSE(x+y == y);
+    CUNIT_EXPECT_FALSE(x+y == y);
+    CUNIT_ASSERT_FALSE(x+y == y);
+    CUNIT_ASSERT_FALSE(x+y == y);
 }
 
 CUNIT_TEST(int_eq)
@@ -127,6 +136,13 @@ CUNIT_TEST(float_eq)
     CUNIT_EXPECT_FLOAT_EQ_THRESHOLD(x, z, 5);
     CUNIT_EXPECT_FLOAT_EQ(x, w);
     CUNIT_ASSERT_FLOAT_EQ(x, w);
+}
+
+CUNIT_TEST(float_neq)
+{
+    float a = 1.f, b = 2.f;
+    CUNIT_ASSERT_FLOAT_NEQ(a, b);
+    CUNIT_ASSERT_FLOAT_NEQ(a, b);
 }
 
 CUNIT_TEST(int_leq)
@@ -232,6 +248,126 @@ CUNIT_TEST(ptr_not_null)
     CUNIT_ASSERT_PTR_NOT_NULL(b);
 }
 
+typedef struct
+{
+    char text[4];
+    int status;
+    float successRate;
+} MemEqTestData;
+
+CUNIT_TEST(mem_eq_stack)
+{
+    MemEqTestData stack_1 = (MemEqTestData)
+    {
+        .text = "asd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    MemEqTestData stack_2 = (MemEqTestData)
+    {
+        .text = "asd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    MemEqTestData stack_3 = (MemEqTestData)
+    {
+        .text = "bsd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    CUNIT_ASSERT_MEM_EQ(&stack_1, &stack_2, sizeof(MemEqTestData));
+    CUNIT_ASSERT_MEM_EQ(&stack_1, &stack_3, sizeof(MemEqTestData));
+}
+
+CUNIT_TEST(mem_eq_heap)
+{
+    MemEqTestData* heap_1 = malloc(sizeof(MemEqTestData));
+    *heap_1 = (MemEqTestData)
+    {
+        .text = "asd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    MemEqTestData* heap_2 = malloc(sizeof(MemEqTestData));
+    *heap_2 = (MemEqTestData)
+    {
+        .text = "asd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    MemEqTestData* heap_3 = malloc(sizeof(MemEqTestData));
+    *heap_3 = (MemEqTestData)
+    {
+        .text = "bsd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    CUNIT_ASSERT_MEM_EQ(heap_1, heap_2, sizeof(MemEqTestData));
+    CUNIT_ASSERT_MEM_EQ(heap_1, heap_3, sizeof(MemEqTestData));
+}
+
+CUNIT_TEST(mem_neq_stack)
+{
+    MemEqTestData stack_1 = (MemEqTestData)
+    {
+        .text = "asd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    MemEqTestData stack_2 = (MemEqTestData)
+    {
+        .text = "asd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    MemEqTestData stack_3 = (MemEqTestData)
+    {
+        .text = "bsd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    CUNIT_ASSERT_MEM_NEQ(&stack_1, &stack_3, sizeof(MemEqTestData));
+    CUNIT_ASSERT_MEM_NEQ(&stack_1, &stack_2, sizeof(MemEqTestData));
+}
+
+CUNIT_TEST(mem_neq_heap)
+{
+    MemEqTestData* heap_1 = malloc(sizeof(MemEqTestData));
+    *heap_1 = (MemEqTestData)
+    {
+        .text = "asd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    MemEqTestData* heap_2 = malloc(sizeof(MemEqTestData));
+    *heap_2 = (MemEqTestData)
+    {
+        .text = "asd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    MemEqTestData* heap_3 = malloc(sizeof(MemEqTestData));
+    *heap_3 = (MemEqTestData)
+    {
+        .text = "bsd",
+        .status = 1,
+        .successRate = 0.5678,
+    };
+
+    CUNIT_ASSERT_MEM_EQ(heap_1, heap_3, sizeof(MemEqTestData));
+    CUNIT_ASSERT_MEM_EQ(heap_1, heap_2, sizeof(MemEqTestData));
+}
 CUNIT_SETUP_ONETIME()
 {
     printf("Establish connection to DB....\n");

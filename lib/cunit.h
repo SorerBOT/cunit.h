@@ -12,8 +12,11 @@
 #define ERROR_MESSAGE_BUFFER 256
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
 
-#define CUNIT_ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_TRUE(condition) cunit_assert_true((condition), (#condition), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_TRUE(condition) cunit_assert_true((condition), (#condition), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_FALSE(condition) cunit_assert_false((condition), (#condition), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_FALSE(condition) cunit_assert_false((condition), (#condition), __FILE__, __LINE__, 0)
 
 #define CUNIT_ASSERT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 0)
@@ -23,6 +26,9 @@
 
 #define CUNIT_ASSERT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
 #define CUNIT_EXPECT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+
+#define CUNIT_ASSERT_FLOAT_NEQ(a,b) cunit_assert_float_neq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_NEQ(a,b) cunit_assert_float_neq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
 #define CUNIT_ASSERT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, (threshold))
 #define CUNIT_EXPECT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, (threshold))
@@ -51,6 +57,11 @@
 #define CUNIT_ASSERT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 0)
 
+#define CUNIT_ASSERT_MEM_EQ(a,b, size) cunit_assert_mem_eq((a), (b), (size), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_MEM_EQ(a,b, size) cunit_assert_mem_eq((a), (b), (size), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_MEM_NEQ(a,b, size) cunit_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_MEM_NEQ(a,b, size) cunit_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 0)
 /*
  * assert that a contains b
  */
@@ -374,7 +385,7 @@ void cunit_run_registered_tests()
     printf("**** CleanUpOneTime function finished successfully....\n");
 }
 
-void cunit_assert(int condition, const char* condition_expression,
+void cunit_assert_true(int condition, const char* condition_expression,
                     const char* fileName, int lineNumber,
                     int shouldAbort)
 {
@@ -383,7 +394,24 @@ void cunit_assert(int condition, const char* condition_expression,
         return;
     }
 
-    printf("%s:%d FAILED. Expected %s\n", fileName, lineNumber, condition_expression);
+    printf("%s:%d FAILED. Expected %s to be TRUE\n", fileName, lineNumber, condition_expression);
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+void cunit_assert_false(int condition, const char* condition_expression,
+                    const char* fileName, int lineNumber,
+                    int shouldAbort)
+{
+    if (!condition)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected %s to be FALSE\n", fileName, lineNumber, condition_expression);
 
     if (shouldAbort)
     {
@@ -438,6 +466,25 @@ void cunit_assert_float_eq(long double a, long double b,
     }
 
     printf("%s:%d FAILED. Expected %Lf == %Lf (used threshold: %Lf)\n", fileName, lineNumber, a, b, threshold);
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_float_neq(long double a, long double b,
+                            const char* fileName, int lineNumber,
+                            int shouldAbort, long double threshold)
+{
+    // to be written tomorrow
+    if (cunit_fabsl(a - b) > threshold)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected %Lf != %Lf (used threshold: %Lf)\n", fileName, lineNumber, a, b, threshold);
 
     if (shouldAbort)
     {
@@ -663,4 +710,53 @@ void cunit_assert_ptr_not_null(const void* a, const char* fileName,
         abort();
     }
 }
+
+void cunit_assert_mem_eq(const void* a, const void* b,
+                            size_t length, const char* fileName,
+                            int lineNumber, int shouldAbort)
+{
+    if (a == NULL || b == NULL)
+    {
+        printf("%s:%d FAILED. Expected valid pointers, but got NULL in at least one of them\n", fileName, lineNumber);
+    }
+    else
+    {
+        if ( memcmp(a, b, length) == 0 )
+        {
+            return;
+        }
+        printf("%s:%d FAILED. Expected contents of pointers %p and %p to be bytewise-identical\n", fileName, lineNumber, a, b);
+    }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_mem_neq(const void* a, const void* b,
+                            size_t length, const char* fileName,
+                            int lineNumber, int shouldAbort)
+{
+    if (a == NULL || b == NULL)
+    {
+        printf("%s:%d FAILED. Expected valid pointers, but got NULL in at least one of them\n", fileName, lineNumber);
+    }
+    else
+    {
+        if ( memcmp(a, b, length) != 0 )
+        {
+            return;
+        }
+        printf("%s:%d FAILED. Expected contents of pointers %p and %p to be bytewise-different\n", fileName, lineNumber, a, b);
+    }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
 #endif /* CUNIT_H */
