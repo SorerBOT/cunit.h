@@ -24,6 +24,9 @@
 #define CUNIT_ASSERT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
 #define CUNIT_EXPECT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
+#define CUNIT_ASSERT_FLOAT_NEQ(a,b) cunit_assert_float_neq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_NEQ(a,b) cunit_assert_float_neq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+
 #define CUNIT_ASSERT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, (threshold))
 #define CUNIT_EXPECT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, (threshold))
 
@@ -438,6 +441,25 @@ void cunit_assert_float_eq(long double a, long double b,
     }
 
     printf("%s:%d FAILED. Expected %Lf == %Lf (used threshold: %Lf)\n", fileName, lineNumber, a, b, threshold);
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_float_neq(long double a, long double b,
+                            const char* fileName, int lineNumber,
+                            int shouldAbort, long double threshold)
+{
+    // to be written tomorrow
+    if (cunit_fabsl(a - b) > threshold)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected %Lf != %Lf (used threshold: %Lf)\n", fileName, lineNumber, a, b, threshold);
 
     if (shouldAbort)
     {

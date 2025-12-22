@@ -129,6 +129,13 @@ CUNIT_TEST(float_eq)
     CUNIT_ASSERT_FLOAT_EQ(x, w);
 }
 
+CUNIT_TEST(float_neq)
+{
+    float a = 1.f, b = 2.f;
+    CUNIT_ASSERT_FLOAT_NEQ(a, b);
+    CUNIT_ASSERT_FLOAT_NEQ(a, b);
+}
+
 CUNIT_TEST(int_leq)
 {
     int x = 1, y = 5, z = 1;
