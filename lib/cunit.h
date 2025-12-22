@@ -12,8 +12,11 @@
 #define ERROR_MESSAGE_BUFFER 256
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
 
-#define CUNIT_ASSERT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT(condition) cunit_assert((condition), (#condition), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_TRUE(condition) cunit_assert_true((condition), (#condition), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_TRUE(condition) cunit_assert_true((condition), (#condition), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_FALSE(condition) cunit_assert_false((condition), (#condition), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_FALSE(condition) cunit_assert_false((condition), (#condition), __FILE__, __LINE__, 0)
 
 #define CUNIT_ASSERT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 0)
@@ -377,7 +380,7 @@ void cunit_run_registered_tests()
     printf("**** CleanUpOneTime function finished successfully....\n");
 }
 
-void cunit_assert(int condition, const char* condition_expression,
+void cunit_assert_true(int condition, const char* condition_expression,
                     const char* fileName, int lineNumber,
                     int shouldAbort)
 {
@@ -386,7 +389,24 @@ void cunit_assert(int condition, const char* condition_expression,
         return;
     }
 
-    printf("%s:%d FAILED. Expected %s\n", fileName, lineNumber, condition_expression);
+    printf("%s:%d FAILED. Expected %s to be TRUE\n", fileName, lineNumber, condition_expression);
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+void cunit_assert_false(int condition, const char* condition_expression,
+                    const char* fileName, int lineNumber,
+                    int shouldAbort)
+{
+    if (!condition)
+    {
+        return;
+    }
+
+    printf("%s:%d FAILED. Expected %s to be FALSE\n", fileName, lineNumber, condition_expression);
 
     if (shouldAbort)
     {

@@ -7,10 +7,10 @@
 void test_bool()
 {
     int x = 1, y = 2;
-    CUNIT_EXPECT(x+y == y);
-    CUNIT_EXPECT(x+y == y);
-    CUNIT_ASSERT(x+y == y);
-    CUNIT_ASSERT(x+y == y);
+    CUNIT_EXPECT_TRUE(x+y == y);
+    CUNIT_EXPECT_TRUE(x+y == y);
+    CUNIT_ASSERT_TRUE(x+y == y);
+    CUNIT_ASSERT_TRUE(x+y == y);
 }
 void test_int_eq()
 {
@@ -84,13 +84,22 @@ void test_float_lower()
     CUNIT_ASSERT_FLOAT_LOWER(x, w);
 }
 
-CUNIT_TEST(Arithmetic)
+CUNIT_TEST(assert_true)
 {
     int x = 1, y = 2;
-    CUNIT_EXPECT(x+y == y);
-    CUNIT_EXPECT(x+y == y);
-    CUNIT_ASSERT(x+y == y);
-    CUNIT_ASSERT(x+y == y);
+    CUNIT_EXPECT_TRUE(x+y == y);
+    CUNIT_EXPECT_TRUE(x+y == y);
+    CUNIT_ASSERT_TRUE(x+y == y);
+    CUNIT_ASSERT_TRUE(x+y == y);
+}
+
+CUNIT_TEST(assert_false)
+{
+    int x = 1, y = 2;
+    CUNIT_EXPECT_FALSE(x+y == y);
+    CUNIT_EXPECT_FALSE(x+y == y);
+    CUNIT_ASSERT_FALSE(x+y == y);
+    CUNIT_ASSERT_FALSE(x+y == y);
 }
 
 CUNIT_TEST(int_eq)
