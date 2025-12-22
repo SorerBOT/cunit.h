@@ -365,7 +365,7 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
      */
     if (tests_count_passed == tests_count)
     {
-        printf("All tests PASSED!");
+        printf("All tests PASSED!\n");
         return;
     }
     printf("\n%lu tests failed out of %lu tests in total\n", tests_count - tests_count_passed, tests_count);
@@ -420,7 +420,7 @@ void cunit_run_registered_tests()
      */
     if (tests_count_passed == tests_count)
     {
-        printf("All tests PASSED!");
+        printf("All tests PASSED!\n");
         return;
     }
     printf("\n%lu tests failed out of %lu tests in total\n", tests_count - tests_count_passed, tests_count);
