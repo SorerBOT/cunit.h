@@ -57,6 +57,11 @@
 #define CUNIT_ASSERT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 0)
 
+#define CUNIT_ASSERT_MEM_EQ(a,b, size) cunit_assert_mem_eq((a), (b), (size), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_MEM_EQ(a,b, size) cunit_assert_mem_eq((a), (b), (size), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_MEM_NEQ(a,b, size) cunit_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_MEM_NEQ(a,b, size) cunit_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 0)
 /*
  * assert that a contains b
  */
@@ -705,4 +710,53 @@ void cunit_assert_ptr_not_null(const void* a, const char* fileName,
         abort();
     }
 }
+
+void cunit_assert_mem_eq(const void* a, const void* b,
+                            size_t length, const char* fileName,
+                            int lineNumber, int shouldAbort)
+{
+    if (a == NULL || b == NULL)
+    {
+        printf("%s:%d FAILED. Expected valid pointers, but got NULL in at least one of them\n", fileName, lineNumber);
+    }
+    else
+    {
+        if ( memcmp(a, b, length) == 0 )
+        {
+            return;
+        }
+        printf("%s:%d FAILED. Expected contents of pointers %p and %p to be bytewise-identical\n", fileName, lineNumber, a, b);
+    }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit_assert_mem_neq(const void* a, const void* b,
+                            size_t length, const char* fileName,
+                            int lineNumber, int shouldAbort)
+{
+    if (a == NULL || b == NULL)
+    {
+        printf("%s:%d FAILED. Expected valid pointers, but got NULL in at least one of them\n", fileName, lineNumber);
+    }
+    else
+    {
+        if ( memcmp(a, b, length) != 0 )
+        {
+            return;
+        }
+        printf("%s:%d FAILED. Expected contents of pointers %p and %p to be bytewise-different\n", fileName, lineNumber, a, b);
+    }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
 #endif /* CUNIT_H */
