@@ -35,7 +35,7 @@ int main()
 ## How does it work?
 
 ### Test Registration
-In my experience (which is not vast) the predominant majority of unit-tests are quite simple, they revolve around numerical comparisons and assertions and only seldom do they ever crash. For this reason I believe that one of the most distinct features of a testing-library, instead of just writing a main function which goes over standard tests, is having the ability to register tests neatly. In this project, I used the `__attribute(constructor)__` feature, available in modern compilers, which, coupled with some pre-processing _magic_, enabled me to create the following API for registering a test:
+In my experience (which is not THAT vast) the predominant majority of unit-tests are quite simple, they revolve around numerical comparisons and assertions and only seldom do they ever crash. For this reason I believe that one of the most distinct features of a testing-library, instead of just writing a main function which goes over standard tests, is having the ability to register tests neatly. In this project, I used the `__attribute(constructor)__` feature, available in modern compilers, which, coupled with some pre-processing _magic_, enabled me to create the following API for registering a test:
 ```c
 CUNIT_TEST(compare_numbers)
 {
@@ -44,7 +44,7 @@ CUNIT_TEST(compare_numbers)
     ASSERT_INT_LEQ(x,y); // assert x <= y
 }
 ```
-Under the hood, the `CUNIT_TEST` macro looks like this:
+Under the hood, the `CUNIT_TEST` macro looks **almost** like this:
 ```c
 #define CUNIT_TEST(func)                        \
         void func(void);                        \
@@ -63,3 +63,5 @@ There's a bit to unpack here, but mostly what it does is:
 
 
 If this did not bring a smile to your face, I don't know what would ;)
+## Test Running
+Each test is ran in a different process, in order to minimise friction between the tests.
