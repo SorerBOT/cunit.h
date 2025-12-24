@@ -27,7 +27,11 @@
 #include <stddef.h> // size_t
 
 #define ERROR_MESSAGE_BUFFER 256
+#ifdef CUNIT_USER_THRESHOLD
+#define CUNIT_DEFAULT_THRESHOLD CUNIT_USER_THRESHOLD
+#else
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
+#endif
 
 #define CUNIT_ASSERT_TRUE(condition) cunit__internal_assert_true((condition), (#condition), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_TRUE(condition) cunit__internal_assert_true((condition), (#condition), __FILE__, __LINE__, 0)
