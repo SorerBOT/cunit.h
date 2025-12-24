@@ -170,7 +170,6 @@ void cunit_register_setup(cunit_func_t func);
 void cunit_register_cleanup(cunit_func_t func);
 void cunit_register_setup_onetime(cunit_func_t func);
 void cunit_register_cleanup_onetime(cunit_func_t func);
-void cunit_run_test(const cunit_test_t* test);
 
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
 void cunit_run_registered_tests();
@@ -201,6 +200,7 @@ void cunit_assert_mem_neq(const void* a, const void* b, size_t length, const cha
 #ifdef CUNIT_IMPLEMENTATION
 
 static long double cunit_fabsl(long double x);
+static void cunit_run_test(const cunit_test_t* test);
 
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
@@ -212,7 +212,7 @@ cunit_func_t cleanup_func = NULL;
 cunit_func_t setup_onetime_func = NULL;
 cunit_func_t cleanup_onetime_func = NULL;
 
-long double cunit_fabsl(long double x)
+static long double cunit_fabsl(long double x)
 {
     if (x >= 0)
     {
@@ -318,7 +318,7 @@ void cunit_free_tests()
     tests = NULL;
 }
 
-void cunit_run_test(const cunit_test_t* test)
+static void cunit_run_test(const cunit_test_t* test)
 {
     /*
      * SETUP
