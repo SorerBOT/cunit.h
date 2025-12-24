@@ -165,16 +165,10 @@ typedef struct
     char* name;
 } cunit_test_t;
 
-long double cunit_fabsl(long double x);
-void cunit_register_test(cunit_func_t func, char* name);
-void cunit_register_setup(cunit_func_t func);
-void cunit_register_cleanup(cunit_func_t func);
-void cunit_register_setup_onetime(cunit_func_t func);
-void cunit_register_cleanup_onetime(cunit_func_t func);
-void cunit_free_tests();
-void cunit_run_test(const cunit_test_t* test);
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
 void cunit_run_registered_tests();
+void cunit_free_tests();
+
 void cunit_assert_true(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort);
 void cunit_assert_false(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort);
 void cunit_assert_int_eq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
@@ -198,6 +192,14 @@ void cunit_assert_mem_neq(const void* a, const void* b, size_t length, const cha
 #endif /* CUNIT_H */
 
 #ifdef CUNIT_IMPLEMENTATION
+
+static long double cunit_fabsl(long double x);
+static void cunit_register_test(cunit_func_t func, char* name);
+static void cunit_register_setup(cunit_func_t func);
+static void cunit_register_cleanup(cunit_func_t func);
+static void cunit_register_setup_onetime(cunit_func_t func);
+static void cunit_register_cleanup_onetime(cunit_func_t func);
+static void cunit_run_test(const cunit_test_t* test);
 
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
