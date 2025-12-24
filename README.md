@@ -26,12 +26,18 @@ CUNIT_TEST(str_eq)
     CUNIT_EXPECT_STR_NEQ(NULL, "Bimba");
     CUNIT_EXPECT_STR_NEQ(NULL, NULL);
 }
-int main()
-{
-    cunit_run_registered_tests();
-    cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
-}
 ```
+
+## What if I want to define my own main function?
+The library defines a default main function, which takes care of running the tests and de-allocating memory (de-allocating memory also happens in the destructor) and runs it without requiring the user to do anything. Should the user wish to define his own, custom main function (even though I cannot seem to find any probable reason for him to wish to do so), he may simply define:
+```c
+#define CUNIT_USE_CUSTOM_MAIN
+...
+#include ".../cunit.h"
+```
+and then add a definition for a `main` function in his own code.
+
+
 ## How does it work?
 
 ### Test Registration
