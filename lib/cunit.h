@@ -34,80 +34,80 @@
 #define ERROR_MESSAGE_BUFFER 256
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
 
-#define CUNIT_ASSERT_TRUE(condition) cunit_assert_true((condition), (#condition), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_TRUE(condition) cunit_assert_true((condition), (#condition), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_TRUE(condition) cunit__internal_assert_true((condition), (#condition), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_TRUE(condition) cunit__internal_assert_true((condition), (#condition), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_FALSE(condition) cunit_assert_false((condition), (#condition), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_FALSE(condition) cunit_assert_false((condition), (#condition), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_FALSE(condition) cunit__internal_assert_false((condition), (#condition), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_FALSE(condition) cunit__internal_assert_false((condition), (#condition), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_INT_EQ(a,b) cunit_assert_int_eq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_INT_EQ(a,b) cunit__internal_assert_int_eq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_INT_EQ(a,b) cunit__internal_assert_int_eq((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_INT_NEQ(a,b) cunit_assert_int_neq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_INT_NEQ(a,b) cunit_assert_int_neq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_INT_NEQ(a,b) cunit__internal_assert_int_neq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_INT_NEQ(a,b) cunit__internal_assert_int_neq((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
-#define CUNIT_EXPECT_FLOAT_EQ(a,b) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_ASSERT_FLOAT_EQ(a,b) cunit__internal_assert_float_eq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_EQ(a,b) cunit__internal_assert_float_eq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
-#define CUNIT_ASSERT_FLOAT_NEQ(a,b) cunit_assert_float_neq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
-#define CUNIT_EXPECT_FLOAT_NEQ(a,b) cunit_assert_float_neq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_ASSERT_FLOAT_NEQ(a,b) cunit__internal_assert_float_neq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_NEQ(a,b) cunit__internal_assert_float_neq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
-#define CUNIT_ASSERT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 1, (threshold))
-#define CUNIT_EXPECT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit_assert_float_eq((a), (b), __FILE__, __LINE__, 0, (threshold))
+#define CUNIT_ASSERT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit__internal_assert_float_eq((a), (b), __FILE__, __LINE__, 1, (threshold))
+#define CUNIT_EXPECT_FLOAT_EQ_THRESHOLD(a,b, threshold) cunit__internal_assert_float_eq((a), (b), __FILE__, __LINE__, 0, (threshold))
 
-#define CUNIT_ASSERT_INT_LEQ(a,b) cunit_assert_int_leq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_INT_LEQ(a,b) cunit_assert_int_leq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_INT_LEQ(a,b) cunit__internal_assert_int_leq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_INT_LEQ(a,b) cunit__internal_assert_int_leq((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_FLOAT_LEQ(a,b) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
-#define CUNIT_EXPECT_FLOAT_LEQ(a,b) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_ASSERT_FLOAT_LEQ(a,b) cunit__internal_assert_float_leq((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_LEQ(a,b) cunit__internal_assert_float_leq((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
-#define CUNIT_ASSERT_FLOAT_LEQ_THRESHOLD(a,b, threshold) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 1, (threshold))
-#define CUNIT_EXPECT_FLOAT_LEQ_THRESHOLD(a,b, threshold) cunit_assert_float_leq((a), (b), __FILE__, __LINE__, 0, (threshold))
+#define CUNIT_ASSERT_FLOAT_LEQ_THRESHOLD(a,b, threshold) cunit__internal_assert_float_leq((a), (b), __FILE__, __LINE__, 1, (threshold))
+#define CUNIT_EXPECT_FLOAT_LEQ_THRESHOLD(a,b, threshold) cunit__internal_assert_float_leq((a), (b), __FILE__, __LINE__, 0, (threshold))
 
-#define CUNIT_ASSERT_INT_LOWER(a,b) cunit_assert_int_lower((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_INT_LOWER(a,b) cunit_assert_int_lower((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_INT_LOWER(a,b) cunit__internal_assert_int_lower((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_INT_LOWER(a,b) cunit__internal_assert_int_lower((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_FLOAT_LOWER(a,b) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
-#define CUNIT_EXPECT_FLOAT_LOWER(a,b) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_ASSERT_FLOAT_LOWER(a,b) cunit__internal_assert_float_lower((a), (b), __FILE__, __LINE__, 1, CUNIT_DEFAULT_THRESHOLD)
+#define CUNIT_EXPECT_FLOAT_LOWER(a,b) cunit__internal_assert_float_lower((a), (b), __FILE__, __LINE__, 0, CUNIT_DEFAULT_THRESHOLD)
 
-#define CUNIT_ASSERT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 1, (threshold))
-#define CUNIT_EXPECT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit_assert_float_lower((a), (b), __FILE__, __LINE__, 0, (threshold))
+#define CUNIT_ASSERT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit__internal_assert_float_lower((a), (b), __FILE__, __LINE__, 1, (threshold))
+#define CUNIT_EXPECT_FLOAT_LOWER_THRESHOLD(a,b, threshold) cunit__internal_assert_float_lower((a), (b), __FILE__, __LINE__, 0, (threshold))
 
-#define CUNIT_ASSERT_STR_EQ(a,b) cunit_assert_str_eq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_STR_EQ(a,b) cunit_assert_str_eq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_STR_EQ(a,b) cunit__internal_assert_str_eq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_EQ(a,b) cunit__internal_assert_str_eq((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_STR_NEQ(a,b) cunit_assert_str_neq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_STR_NEQ(a,b) cunit__internal_assert_str_neq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_NEQ(a,b) cunit__internal_assert_str_neq((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_MEM_EQ(a,b, size) cunit_assert_mem_eq((a), (b), (size), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_MEM_EQ(a,b, size) cunit_assert_mem_eq((a), (b), (size), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_MEM_EQ(a,b, size) cunit__internal_assert_mem_eq((a), (b), (size), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_MEM_EQ(a,b, size) cunit__internal_assert_mem_eq((a), (b), (size), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_MEM_NEQ(a,b, size) cunit_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_MEM_NEQ(a,b, size) cunit_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_MEM_NEQ(a,b, size) cunit__internal_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_MEM_NEQ(a,b, size) cunit__internal_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 0)
 /*
  * assert that a contains b
  */
-#define CUNIT_ASSERT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_STR_CONTAINS(a,b) cunit_assert_str_contains((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_STR_CONTAINS(a,b) cunit__internal_assert_str_contains((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_STR_CONTAINS(a,b) cunit__internal_assert_str_contains((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_PTR_EQ(a,b) cunit_assert_ptr_eq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_PTR_EQ(a,b) cunit_assert_ptr_eq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_PTR_EQ(a,b) cunit__internal_assert_ptr_eq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_PTR_EQ(a,b) cunit__internal_assert_ptr_eq((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_PTR_NEQ(a,b) cunit_assert_ptr_neq((a), (b), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_PTR_NEQ(a,b) cunit_assert_ptr_neq((a), (b), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_PTR_NEQ(a,b) cunit__internal_assert_ptr_neq((a), (b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_PTR_NEQ(a,b) cunit__internal_assert_ptr_neq((a), (b), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_PTR_NULL(a) cunit_assert_ptr_null((a), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_PTR_NULL(a) cunit_assert_ptr_null((a), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_PTR_NULL(a) cunit__internal_assert_ptr_null((a), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_PTR_NULL(a) cunit__internal_assert_ptr_null((a), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_PTR_NOT_NULL(a) cunit_assert_ptr_not_null((a), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_PTR_NOT_NULL(a) cunit_assert_ptr_not_null((a), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_PTR_NOT_NULL(a) cunit__internal_assert_ptr_not_null((a), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_PTR_NOT_NULL(a) cunit__internal_assert_ptr_not_null((a), __FILE__, __LINE__, 0)
 
 #define CUNIT_TEST(func)                                    \
         void _cunit_test_##func(void);                      \
         __attribute__((constructor))                        \
         void _cunit_register_##func()                       \
         {                                                   \
-            cunit_register_test(_cunit_test_##func, #func); \
+            cunit__internal_register_test(_cunit_test_##func, #func); \
         }                                                   \
         void _cunit_test_##func(void)                       \
 
@@ -116,7 +116,7 @@
         __attribute__((constructor))            \
         void _cunit_register_setup()            \
         {                                       \
-            cunit_register_setup(_cunit_setup); \
+            cunit__internal_register_setup(_cunit_setup); \
         }                                       \
         void _cunit_setup(void)
 
@@ -125,7 +125,7 @@
         __attribute__((constructor))                \
         void _cunit_register_cleanup()              \
         {                                           \
-            cunit_register_cleanup(_cunit_cleanup); \
+            cunit__internal_register_cleanup(_cunit_cleanup); \
         }                                           \
         void _cunit_cleanup(void)
 
@@ -134,7 +134,7 @@
         __attribute__((constructor))                            \
         void _cunit_register_setup_onetime()                    \
         {                                                       \
-            cunit_register_setup_onetime(_cunit_setup_onetime); \
+            cunit__internal_register_setup_onetime(_cunit_setup_onetime); \
         }                                                       \
         void _cunit_setup_onetime(void)
 
@@ -143,7 +143,7 @@
         __attribute__((constructor))                \
         void _cunit_register_cleanup_onetime()              \
         {                                           \
-            cunit_register_cleanup_onetime(_cunit_cleanup_onetime); \
+            cunit__internal_register_cleanup_onetime(_cunit_cleanup_onetime); \
         }                                           \
         void _cunit_cleanup_onetime(void)
 
@@ -165,42 +165,42 @@ typedef struct
     char* name;
 } cunit_test_t;
 
-void cunit_register_test(cunit_func_t func, char* name);
-void cunit_register_setup(cunit_func_t func);
-void cunit_register_cleanup(cunit_func_t func);
-void cunit_register_setup_onetime(cunit_func_t func);
-void cunit_register_cleanup_onetime(cunit_func_t func);
-
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
 void cunit_run_registered_tests();
 void cunit_free_tests();
 
-void cunit_assert_true(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_false(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_int_eq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_int_neq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_float_eq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
-void cunit_assert_float_neq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
-void cunit_assert_int_leq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_float_leq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
-void cunit_assert_int_lower(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_float_lower(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
-void cunit_assert_str_eq(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_str_neq(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_str_contains(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_ptr_eq(const void* a, const void* b, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_ptr_neq(const void* a, const void* b, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_ptr_null(const void* a, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_ptr_not_null(const void* a, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_mem_eq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
-void cunit_assert_mem_neq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_register_test(cunit_func_t func, char* name);
+void cunit__internal_register_setup(cunit_func_t func);
+void cunit__internal_register_cleanup(cunit_func_t func);
+void cunit__internal_register_setup_onetime(cunit_func_t func);
+void cunit__internal_register_cleanup_onetime(cunit_func_t func);
+
+void cunit__internal_assert_true(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_false(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_int_eq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_int_neq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_float_eq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
+void cunit__internal_assert_float_neq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
+void cunit__internal_assert_int_leq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_float_leq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
+void cunit__internal_assert_int_lower(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_float_lower(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
+void cunit__internal_assert_str_eq(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_str_neq(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_str_contains(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_ptr_eq(const void* a, const void* b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_ptr_neq(const void* a, const void* b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_ptr_null(const void* a, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_ptr_not_null(const void* a, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_mem_eq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
 
 #endif /* CUNIT_H */
 
 #ifdef CUNIT_IMPLEMENTATION
 
-static long double cunit_fabsl(long double x);
-static void cunit_run_test(const cunit_test_t* test);
+static long double cunit__internal_fabsl(long double x);
+static void cunit__internal_run_test(const cunit_test_t* test);
 
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
@@ -212,7 +212,7 @@ cunit_func_t cleanup_func = NULL;
 cunit_func_t setup_onetime_func = NULL;
 cunit_func_t cleanup_onetime_func = NULL;
 
-static long double cunit_fabsl(long double x)
+static long double cunit__internal_fabsl(long double x)
 {
     if (x >= 0)
     {
@@ -224,7 +224,7 @@ static long double cunit_fabsl(long double x)
     }
 }
 
-void cunit_register_test(cunit_func_t func, char* name)
+void cunit__internal_register_test(cunit_func_t func, char* name)
 {
     cunit_test_t* test = malloc(sizeof(cunit_test_t));
 
@@ -255,7 +255,7 @@ void cunit_register_test(cunit_func_t func, char* name)
     last_test = test;
 }
 
-void cunit_register_setup(cunit_func_t func)
+void cunit__internal_register_setup(cunit_func_t func)
 {
     if (setup_func != NULL)
     {
@@ -265,7 +265,7 @@ void cunit_register_setup(cunit_func_t func)
     setup_func = func;
 }
 
-void cunit_register_cleanup(cunit_func_t func)
+void cunit__internal_register_cleanup(cunit_func_t func)
 {
     if (cleanup_func != NULL)
     {
@@ -275,7 +275,7 @@ void cunit_register_cleanup(cunit_func_t func)
     cleanup_func = func;
 }
 
-void cunit_register_setup_onetime(cunit_func_t func)
+void cunit__internal_register_setup_onetime(cunit_func_t func)
 {
     if (setup_onetime_func != NULL)
     {
@@ -285,7 +285,7 @@ void cunit_register_setup_onetime(cunit_func_t func)
     setup_onetime_func = func;
 }
 
-void cunit_register_cleanup_onetime(cunit_func_t func)
+void cunit__internal_register_cleanup_onetime(cunit_func_t func)
 {
     if (cleanup_onetime_func != NULL)
     {
@@ -318,7 +318,7 @@ void cunit_free_tests()
     tests = NULL;
 }
 
-static void cunit_run_test(const cunit_test_t* test)
+static void cunit__internal_run_test(const cunit_test_t* test)
 {
     /*
      * SETUP
@@ -405,7 +405,7 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
         printf("============================================\n");
         printf("Running test: %s\n", tests[i].name);
         fflush(NULL);
-        cunit_run_test(&tests[i]);
+        cunit__internal_run_test(&tests[i]);
     }
     printf("============================================\n");
 
@@ -451,7 +451,7 @@ void cunit_run_registered_tests()
         printf("============================================\n");
         printf("Running test: %s\n", current_test->name);
         fflush(NULL);
-        cunit_run_test(current_test);
+        cunit__internal_run_test(current_test);
         if (current_test->list_data.next_node == NULL)
         {
             current_test = NULL;
@@ -486,7 +486,7 @@ void cunit_run_registered_tests()
     printf("\n%lu tests failed out of %lu tests in total\n", tests_count - tests_count_passed, tests_count);
 }
 
-void cunit_assert_true(int condition, const char* condition_expression,
+void cunit__internal_assert_true(int condition, const char* condition_expression,
                     const char* fileName, int lineNumber,
                     int shouldAbort)
 {
@@ -503,7 +503,7 @@ void cunit_assert_true(int condition, const char* condition_expression,
         abort();
     }
 }
-void cunit_assert_false(int condition, const char* condition_expression,
+void cunit__internal_assert_false(int condition, const char* condition_expression,
                     const char* fileName, int lineNumber,
                     int shouldAbort)
 {
@@ -521,7 +521,7 @@ void cunit_assert_false(int condition, const char* condition_expression,
     }
 }
 
-void cunit_assert_int_eq(intmax_t a, intmax_t b,
+void cunit__internal_assert_int_eq(intmax_t a, intmax_t b,
                             const char* fileName, int lineNumber,
                             int shouldAbort)
 {
@@ -539,7 +539,7 @@ void cunit_assert_int_eq(intmax_t a, intmax_t b,
     }
 }
 
-void cunit_assert_int_neq(intmax_t a, intmax_t b,
+void cunit__internal_assert_int_neq(intmax_t a, intmax_t b,
                             const char* fileName, int lineNumber,
                             int shouldAbort)
 {
@@ -557,11 +557,11 @@ void cunit_assert_int_neq(intmax_t a, intmax_t b,
     }
 }
 
-void cunit_assert_float_eq(long double a, long double b,
+void cunit__internal_assert_float_eq(long double a, long double b,
                             const char* fileName, int lineNumber,
                             int shouldAbort, long double threshold)
 {
-    if (cunit_fabsl(a - b) <= threshold)
+    if (cunit__internal_fabsl(a - b) <= threshold)
     {
         return;
     }
@@ -575,12 +575,12 @@ void cunit_assert_float_eq(long double a, long double b,
     }
 }
 
-void cunit_assert_float_neq(long double a, long double b,
+void cunit__internal_assert_float_neq(long double a, long double b,
                             const char* fileName, int lineNumber,
                             int shouldAbort, long double threshold)
 {
     // to be written tomorrow
-    if (cunit_fabsl(a - b) > threshold)
+    if (cunit__internal_fabsl(a - b) > threshold)
     {
         return;
     }
@@ -594,7 +594,7 @@ void cunit_assert_float_neq(long double a, long double b,
     }
 }
 
-void cunit_assert_int_leq(intmax_t a, intmax_t b,
+void cunit__internal_assert_int_leq(intmax_t a, intmax_t b,
                             const char* fileName, int lineNumber,
                             int shouldAbort)
 {
@@ -610,11 +610,11 @@ void cunit_assert_int_leq(intmax_t a, intmax_t b,
     }
 }
 
-void cunit_assert_float_leq(long double a, long double b,
+void cunit__internal_assert_float_leq(long double a, long double b,
                             const char* fileName, int lineNumber,
                             int shouldAbort, long double threshold)
 {
-    if (a <= b || cunit_fabsl(a - b) <= threshold)
+    if (a <= b || cunit__internal_fabsl(a - b) <= threshold)
     {
         return;
     }
@@ -626,7 +626,7 @@ void cunit_assert_float_leq(long double a, long double b,
     }
 }
 
-void cunit_assert_int_lower(intmax_t a, intmax_t b,
+void cunit__internal_assert_int_lower(intmax_t a, intmax_t b,
                             const char* fileName, int lineNumber,
                             int shouldAbort)
 {
@@ -642,7 +642,7 @@ void cunit_assert_int_lower(intmax_t a, intmax_t b,
     }
 }
 
-void cunit_assert_float_lower(long double a, long double b,
+void cunit__internal_assert_float_lower(long double a, long double b,
                             const char* fileName, int lineNumber,
                             int shouldAbort, long double threshold)
 {
@@ -658,7 +658,7 @@ void cunit_assert_float_lower(long double a, long double b,
     }
 }
 
-void cunit_assert_str_eq(const char* a, const char* b,
+void cunit__internal_assert_str_eq(const char* a, const char* b,
                         char* fileName, int lineNumber,
                         int shouldAbort)
 {
@@ -680,7 +680,7 @@ void cunit_assert_str_eq(const char* a, const char* b,
     }
 }
 
-void cunit_assert_str_neq(const char* a, const char* b,
+void cunit__internal_assert_str_neq(const char* a, const char* b,
                         char* fileName, int lineNumber,
                         int shouldAbort)
 {
@@ -703,7 +703,7 @@ void cunit_assert_str_neq(const char* a, const char* b,
     }
 }
 
-void cunit_assert_str_contains(const char* a, const char* b,
+void cunit__internal_assert_str_contains(const char* a, const char* b,
                         char* fileName, int lineNumber,
                         int shouldAbort)
 {
@@ -724,7 +724,7 @@ void cunit_assert_str_contains(const char* a, const char* b,
     }
 }
 
-void cunit_assert_ptr_eq(const void* a, const void* b,
+void cunit__internal_assert_ptr_eq(const void* a, const void* b,
                             const char* fileName, int lineNumber,
                             int shouldAbort)
 {
@@ -751,7 +751,7 @@ void cunit_assert_ptr_eq(const void* a, const void* b,
     }
 }
 
-void cunit_assert_ptr_neq(const void* a, const void* b,
+void cunit__internal_assert_ptr_neq(const void* a, const void* b,
                             const char* fileName, int lineNumber,
                             int shouldAbort)
 {
@@ -778,7 +778,7 @@ void cunit_assert_ptr_neq(const void* a, const void* b,
     }
 }
 
-void cunit_assert_ptr_null(const void* a, const char* fileName,
+void cunit__internal_assert_ptr_null(const void* a, const char* fileName,
                             int lineNumber, int shouldAbort)
 {
     if (a == NULL)
@@ -795,7 +795,7 @@ void cunit_assert_ptr_null(const void* a, const char* fileName,
     }
 }
 
-void cunit_assert_ptr_not_null(const void* a, const char* fileName,
+void cunit__internal_assert_ptr_not_null(const void* a, const char* fileName,
                             int lineNumber, int shouldAbort)
 {
     if (a != NULL)
@@ -812,7 +812,7 @@ void cunit_assert_ptr_not_null(const void* a, const char* fileName,
     }
 }
 
-void cunit_assert_mem_eq(const void* a, const void* b,
+void cunit__internal_assert_mem_eq(const void* a, const void* b,
                             size_t length, const char* fileName,
                             int lineNumber, int shouldAbort)
 {
@@ -836,7 +836,7 @@ void cunit_assert_mem_eq(const void* a, const void* b,
     }
 }
 
-void cunit_assert_mem_neq(const void* a, const void* b,
+void cunit__internal_assert_mem_neq(const void* a, const void* b,
                             size_t length, const char* fileName,
                             int lineNumber, int shouldAbort)
 {
