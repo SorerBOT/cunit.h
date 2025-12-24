@@ -23,13 +23,9 @@
 #ifndef CUNIT_H
 #define CUNIT_H
 
-#include <signal.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <string.h>
-#include <stdint.h>
+#include <stdint.h> // intmax_t
+#include <stddef.h> // size_t
+
 
 #define ERROR_MESSAGE_BUFFER 256
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
@@ -198,6 +194,12 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #endif /* CUNIT_H */
 
 #ifdef CUNIT_IMPLEMENTATION
+#include <stdlib.h> // malloc, free
+#include <stdio.h> // printf
+#include <unistd.h> // fork
+#include <sys/wait.h> // wait
+#include <signal.h> // signal numbers, macros
+#include <string.h> // strsignal
 
 static long double cunit__internal_fabsl(long double x);
 static void cunit__internal_run_test(const cunit_test_t* test);
