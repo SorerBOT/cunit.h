@@ -194,6 +194,13 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 
 #ifdef CUNIT_IMPLEMENTATION
 
+#include <stdlib.h> // malloc, free
+#include <stdio.h> // printf
+#include <unistd.h> // fork
+#include <sys/wait.h> // wait
+#include <signal.h> // signal numbers, macros
+#include <string.h> // strsignal
+
 static long double cunit__internal_fabsl(long double x);
 static void cunit__internal_run_test(const cunit_test_t* test);
 
@@ -864,4 +871,4 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b,
     }
 }
 
-#endif /* CUNIT_H */
+#endif /* CUNIT_IMPLEMENTATION */
