@@ -146,17 +146,6 @@
             cunit_register_cleanup_onetime(_cunit_cleanup_onetime); \
         }                                           \
         void _cunit_cleanup_onetime(void)
-long double cunit_fabsl(long double x)
-{
-    if (x >= 0)
-    {
-        return x;
-    }
-    else
-    {
-        return -x;
-    }
-}
 
 typedef void(*cunit_func_t)(void);
 
@@ -176,6 +165,40 @@ typedef struct
     char* name;
 } cunit_test_t;
 
+long double cunit_fabsl(long double x);
+void cunit_register_test(cunit_func_t func, char* name);
+void cunit_register_setup(cunit_func_t func);
+void cunit_register_cleanup(cunit_func_t func);
+void cunit_register_setup_onetime(cunit_func_t func);
+void cunit_register_cleanup_onetime(cunit_func_t func);
+void cunit_free_tests();
+void cunit_run_test(const cunit_test_t* test);
+void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
+void cunit_run_registered_tests();
+void cunit_assert_true(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_false(int condition, const char* condition_expression, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_int_eq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_int_neq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_float_eq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
+void cunit_assert_float_neq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
+void cunit_assert_int_leq(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_float_leq(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
+void cunit_assert_int_lower(intmax_t a, intmax_t b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_float_lower(long double a, long double b, const char* fileName, int lineNumber, int shouldAbort, long double threshold);
+void cunit_assert_str_eq(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_str_neq(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_str_contains(const char* a, const char* b, char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_ptr_eq(const void* a, const void* b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_ptr_neq(const void* a, const void* b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_ptr_null(const void* a, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_ptr_not_null(const void* a, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_mem_eq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
+void cunit_assert_mem_neq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
+
+#endif /* CUNIT_H */
+
+#ifdef CUNIT_IMPLEMENTATION
+
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
 size_t tests_count = 0;
@@ -185,6 +208,18 @@ cunit_func_t setup_func = NULL;
 cunit_func_t cleanup_func = NULL;
 cunit_func_t setup_onetime_func = NULL;
 cunit_func_t cleanup_onetime_func = NULL;
+
+long double cunit_fabsl(long double x)
+{
+    if (x >= 0)
+    {
+        return x;
+    }
+    else
+    {
+        return -x;
+    }
+}
 
 void cunit_register_test(cunit_func_t func, char* name)
 {

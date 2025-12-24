@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <signal.h>
+#define CUNIT_IMPLEMENTATION
 #include "../lib/cunit.h"
 
 #define REGISTERATION_AUTOMATIQUE 1
