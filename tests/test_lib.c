@@ -387,6 +387,7 @@ CUNIT_CLEANUP()
 }
 // int main()
 // {
+//     printf("Using custom main\n");
 //     cunit_test_t tests[] =
 //     {
 //         { .func = test_bool, .name = "Arithmetic" },
