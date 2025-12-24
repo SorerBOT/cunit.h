@@ -26,7 +26,6 @@
 #include <stdint.h> // intmax_t
 #include <stddef.h> // size_t
 
-
 #define ERROR_MESSAGE_BUFFER 256
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
 
@@ -201,6 +200,13 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #include <signal.h> // signal numbers, macros
 #include <string.h> // strsignal
 
+#include <stdlib.h> // malloc, free
+#include <stdio.h> // printf
+#include <unistd.h> // fork
+#include <sys/wait.h> // wait
+#include <signal.h> // signal numbers, macros
+#include <string.h> // strsignal
+
 static long double cunit__internal_fabsl(long double x);
 static void cunit__internal_run_test(const cunit_test_t* test);
 
@@ -213,6 +219,15 @@ cunit_func_t setup_func = NULL;
 cunit_func_t cleanup_func = NULL;
 cunit_func_t setup_onetime_func = NULL;
 cunit_func_t cleanup_onetime_func = NULL;
+
+#ifndef CUNIT_USE_CUSTOM_MAIN
+int main()
+{
+    cunit_run_registered_tests();
+    cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
+}
+#endif
+
 
 static long double cunit__internal_fabsl(long double x)
 {
@@ -862,4 +877,4 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b,
     }
 }
 
-#endif /* CUNIT_H */
+#endif /* CUNIT_IMPLEMENTATION */

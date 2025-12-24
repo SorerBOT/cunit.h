@@ -385,24 +385,24 @@ CUNIT_CLEANUP()
 {
     printf("Delete DB after test....\n");
 }
-int main()
-{
-    cunit_test_t tests[] =
-    {
-        { .func = test_bool, .name = "Arithmetic" },
-        { .func = test_crash, .name = "Rocket Science" },
-        { .func = test_int_eq, .name = "shouldComputeSum" },
-        { .func = test_float_eq, .name = "test float equality"},
-        { .func = test_int_leq, .name = "test int leq"},
-        { .func = test_float_leq, .name = "test float leq"},
-        { .func = test_int_lower, .name = "test int lower"},
-        { .func = test_float_lower, .name = "test float lower"},
-    };
-#if REGISTERATION_AUTOMATIQUE
-    cunit_run_registered_tests();
-#else
-    cunit_run_tests(tests, 8);
-#endif
-
-    cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
-}
+// int main()
+// {
+//     cunit_test_t tests[] =
+//     {
+//         { .func = test_bool, .name = "Arithmetic" },
+//         { .func = test_crash, .name = "Rocket Science" },
+//         { .func = test_int_eq, .name = "shouldComputeSum" },
+//         { .func = test_float_eq, .name = "test float equality"},
+//         { .func = test_int_leq, .name = "test int leq"},
+//         { .func = test_float_leq, .name = "test float leq"},
+//         { .func = test_int_lower, .name = "test int lower"},
+//         { .func = test_float_lower, .name = "test float lower"},
+//     };
+// #if REGISTERATION_AUTOMATIQUE
+//     cunit_run_registered_tests();
+// #else
+//     cunit_run_tests(tests, 8);
+// #endif
+// 
+//     cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
+// }
