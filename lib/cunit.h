@@ -23,6 +23,7 @@
 #ifndef CUNIT_H
 #define CUNIT_H
 
+#include <cstdio>
 #include <stdint.h> // intmax_t
 #include <stddef.h> // size_t
 
@@ -166,7 +167,9 @@ typedef struct
 
 typedef struct
 {
-    cunit_test_t test_first;
+    cunit_linked_list_t list_data;
+    cunit_test_t* test_first;
+    cunit_test_t* test_last;
     const char* name;
 } cunit_suite_t;
 
@@ -220,6 +223,7 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 static long double cunit__internal_fabsl(long double x);
 static void cunit__internal_run_test(const cunit_test_t* test);
 
+cunit_suite_t* suites = NULL;
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
 size_t tests_count = 0;
@@ -251,7 +255,7 @@ static long double cunit__internal_fabsl(long double x)
     }
 }
 
-void cunit__internal_register_test(cunit_func_t func, const char* name)
+void cunit__internal_register_test(cunit_func_t func, const char* name, const char* fileName)
 {
     cunit_test_t* test = malloc(sizeof(cunit_test_t));
 
@@ -271,15 +275,49 @@ void cunit__internal_register_test(cunit_func_t func, const char* name)
         }
     };
 
-    if (tests == NULL)
+    if (suites == NULL)
     {
-        tests = test;
-        last_test = test;
-        return;
+        cunit_suite_t* suite = malloc(sizeof(cunit_suite_t));
+        if (suite == NULL)
+        {
+            fprintf(stderr, "malloc()");
+            exit(EXIT_FAILURE);
+        }
+        *suite = (cunit_suite_t)
+        {
+            .list_data = (cunit_linked_list_t)
+            {
+                .next_node = NULL
+            },
+            .test_first = test,
+            .test_last = test,
+            .name = fileName
+        };
     }
-
-    last_test->list_data.next_node = &test->list_data;
-    last_test = test;
+    else
+    {
+        cunit_suite_t* current_suite = suites;
+        while (current_suite != NULL)
+        {
+            if ( strcmp(current_suite->name, fileName) == 0 )
+            {
+                if (tests == NULL)
+                {
+                    current_suite->test_first = test;
+                    current_suite->test_last = test;
+                }
+                else
+                {
+                    current_suite->test_last->list_data.next_node = &test->list_data;
+                    current_suite->test_last = test;
+                }
+            }
+            else
+            {
+                current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
+            }
+        }
+    }
 }
 
 void cunit__internal_register_setup(cunit_func_t func)
