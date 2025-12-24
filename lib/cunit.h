@@ -161,14 +161,20 @@ typedef struct
 {
     cunit_linked_list_t list_data;
     cunit_func_t func;
-    char* name;
+    const char* name;
 } cunit_test_t;
+
+typedef struct
+{
+    cunit_test_t test_first;
+    const char* name;
+} cunit_suite_t;
 
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
 void cunit_run_registered_tests();
 void cunit_free_tests();
 
-void cunit__internal_register_test(cunit_func_t func, char* name);
+void cunit__internal_register_test(cunit_func_t func, const char* name);
 void cunit__internal_register_setup(cunit_func_t func);
 void cunit__internal_register_cleanup(cunit_func_t func);
 void cunit__internal_register_setup_onetime(cunit_func_t func);
@@ -245,7 +251,7 @@ static long double cunit__internal_fabsl(long double x)
     }
 }
 
-void cunit__internal_register_test(cunit_func_t func, char* name)
+void cunit__internal_register_test(cunit_func_t func, const char* name)
 {
     cunit_test_t* test = malloc(sizeof(cunit_test_t));
 
