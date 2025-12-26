@@ -102,13 +102,13 @@
 #define CUNIT_EXPECT_PTR_NOT_NULL(a) cunit__internal_assert_ptr_not_null((a), __FILE__, __LINE__, 0)
 
 #define CUNIT_TEST(func)                                    \
-        void _cunit_test_##func(void);                      \
+        static void _cunit_test_##func(void);               \
         __attribute__((constructor))                        \
-        void _cunit_register_##func()                       \
+        static void _cunit_register_##func()                       \
         {                                                   \
             cunit__internal_register_test(_cunit_test_##func, #func, __FILE__); \
         }                                                   \
-        void _cunit_test_##func(void)                       \
+        static void _cunit_test_##func(void)                \
 
 #define CUNIT_SETUP()                           \
         void _cunit_setup(void);                \
@@ -176,6 +176,8 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
 void cunit_run_registered_tests();
 void cunit_free_tests();
 
+void cunit__internal_debug_print_tests_list();
+
 void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName);
 void cunit__internal_register_setup(cunit_func_t func);
 void cunit__internal_register_cleanup(cunit_func_t func);
@@ -205,12 +207,6 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #endif /* CUNIT_H */
 
 #ifdef CUNIT_IMPLEMENTATION
-#include <stdlib.h> // malloc, free
-#include <stdio.h> // printf
-#include <unistd.h> // fork
-#include <sys/wait.h> // wait
-#include <signal.h> // signal numbers, macros
-#include <string.h> // strsignal
 
 #include <stdlib.h> // malloc, free
 #include <stdio.h> // printf
@@ -221,6 +217,7 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 
 static long double cunit__internal_fabsl(long double x);
 static void cunit__internal_run_test(const cunit_test_t* test);
+static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test);
 
 cunit_suite_t* suites = NULL;
 cunit_suite_t* last_suite = NULL;
@@ -238,6 +235,7 @@ cunit_func_t cleanup_onetime_func = NULL;
 #ifndef CUNIT_USE_CUSTOM_MAIN
 int main()
 {
+    cunit__internal_debug_print_tests_list();
     cunit_run_registered_tests();
     cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
 }
@@ -256,7 +254,7 @@ static long double cunit__internal_fabsl(long double x)
     }
 }
 
-static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
+inline static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
 {
     cunit_test_t* current_test = suite->test_last;
     if (current_test == NULL)
@@ -334,7 +332,24 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
         last_suite->list_data.next_node = (cunit_linked_list_t*) suite;
         last_suite = suite;
     }
+}
 
+void cunit__internal_debug_print_tests_list()
+{
+    printf("\n\n");
+    cunit_suite_t* current_suite = suites;
+    while (current_suite != NULL)
+    {
+        printf("Printing tests for suite: %s\n", current_suite->name);
+        cunit_test_t* current_test = current_suite->test_first;
+        while (current_test != NULL)
+        {
+            printf("\t\t%s\n", current_test->name);
+            current_test = (cunit_test_t*) current_test->list_data.next_node;
+        }
+        current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
+    }
+    printf("\n\n");
 }
 
 void cunit__internal_register_setup(cunit_func_t func)
@@ -531,9 +546,9 @@ void cunit_run_registered_tests()
     while (current_suite != NULL)
     {
         printf("============================================\n");
-        cunit_test_t* current_test = suites->test_first;
         printf("Running tests in suite: %s\n", current_suite->name);
 
+        cunit_test_t* current_test = current_suite->test_first;
         while (current_test != NULL)
         {
             printf("Running test: %s\n", current_test->name);
