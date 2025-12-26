@@ -106,7 +106,7 @@
         __attribute__((constructor))                        \
         void _cunit_register_##func()                       \
         {                                                   \
-            cunit__internal_register_test(_cunit_test_##func, #func); \
+            cunit__internal_register_test(_cunit_test_##func, #func, __FILE__); \
         }                                                   \
         void _cunit_test_##func(void)                       \
 
@@ -161,14 +161,22 @@ typedef struct
 {
     cunit_linked_list_t list_data;
     cunit_func_t func;
-    char* name;
+    const char* name;
 } cunit_test_t;
+
+typedef struct
+{
+    cunit_linked_list_t list_data;
+    cunit_test_t* test_first;
+    cunit_test_t* test_last;
+    const char* name;
+} cunit_suite_t;
 
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
 void cunit_run_registered_tests();
 void cunit_free_tests();
 
-void cunit__internal_register_test(cunit_func_t func, char* name);
+void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName);
 void cunit__internal_register_setup(cunit_func_t func);
 void cunit__internal_register_cleanup(cunit_func_t func);
 void cunit__internal_register_setup_onetime(cunit_func_t func);
@@ -214,6 +222,9 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 static long double cunit__internal_fabsl(long double x);
 static void cunit__internal_run_test(const cunit_test_t* test);
 
+cunit_suite_t* suites = NULL;
+cunit_suite_t* last_suite = NULL;
+
 cunit_test_t* tests = NULL;
 cunit_test_t* last_test = NULL;
 size_t tests_count = 0;
@@ -245,7 +256,22 @@ static long double cunit__internal_fabsl(long double x)
     }
 }
 
-void cunit__internal_register_test(cunit_func_t func, char* name)
+static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
+{
+    cunit_test_t* current_test = suite->test_last;
+    if (current_test == NULL)
+    {
+        suite->test_first = test;
+        suite->test_last = test;
+    }
+    else
+    {
+        suite->test_last->list_data.next_node = (cunit_linked_list_t*) test;
+        suite->test_last = test;
+    }
+}
+
+void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName)
 {
     cunit_test_t* test = malloc(sizeof(cunit_test_t));
 
@@ -265,15 +291,50 @@ void cunit__internal_register_test(cunit_func_t func, char* name)
         }
     };
 
-    if (tests == NULL)
+    if (suites != NULL)
     {
-        tests = test;
-        last_test = test;
-        return;
+        cunit_suite_t* current_suite = suites;
+        while (current_suite != NULL)
+        {
+            if ( strcmp(current_suite->name, suiteName) == 0 )
+            {
+                cunit__internal_register_test_to_suite(current_suite, test);
+                return;
+            }
+            else
+            {
+                current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
+            }
+        }
     }
 
-    last_test->list_data.next_node = &test->list_data;
-    last_test = test;
+    cunit_suite_t* suite = malloc(sizeof(cunit_suite_t));
+    if (suite == NULL)
+    {
+        fprintf(stderr, "malloc()");
+        exit(EXIT_FAILURE);
+    }
+    *suite = (cunit_suite_t)
+    {
+        .list_data = (cunit_linked_list_t)
+        {
+            .next_node = NULL
+        },
+            .name = suiteName
+    };
+    cunit__internal_register_test_to_suite(suite, test);
+
+    if (suites == NULL)
+    {
+        suites = suite;
+        last_suite = suite;
+    }
+    else
+    {
+        last_suite->list_data.next_node = (cunit_linked_list_t*) suite;
+        last_suite = suite;
+    }
+
 }
 
 void cunit__internal_register_setup(cunit_func_t func)
@@ -466,21 +527,22 @@ void cunit_run_registered_tests()
         printf("**** SetUpOneTime function finished successfully....\n");
     }
 
-    cunit_test_t* current_test = tests;
-    while (current_test != NULL)
+    cunit_suite_t* current_suite = suites;
+    while (current_suite != NULL)
     {
         printf("============================================\n");
-        printf("Running test: %s\n", current_test->name);
-        fflush(NULL);
-        cunit__internal_run_test(current_test);
-        if (current_test->list_data.next_node == NULL)
+        cunit_test_t* current_test = suites->test_first;
+        printf("Running tests in suite: %s\n", current_suite->name);
+
+        while (current_test != NULL)
         {
-            current_test = NULL;
-        }
-        else
-        {
+            printf("Running test: %s\n", current_test->name);
+            fflush(NULL);
+            cunit__internal_run_test(current_test);
             current_test = (cunit_test_t*) current_test->list_data.next_node;
         }
+
+        current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
     }
     printf("============================================\n");
 
