@@ -236,8 +236,8 @@ cunit_func_t cleanup_onetime_func = NULL;
 int main()
 {
     cunit__internal_debug_print_tests_list();
-    //cunit_run_registered_tests();
-    //cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
+    cunit_run_registered_tests();
+    cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
 }
 #endif
 
@@ -546,9 +546,9 @@ void cunit_run_registered_tests()
     while (current_suite != NULL)
     {
         printf("============================================\n");
-        cunit_test_t* current_test = suites->test_first;
         printf("Running tests in suite: %s\n", current_suite->name);
 
+        cunit_test_t* current_test = current_suite->test_first;
         while (current_test != NULL)
         {
             printf("Running test: %s\n", current_test->name);
