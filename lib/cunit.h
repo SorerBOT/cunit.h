@@ -205,12 +205,6 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #endif /* CUNIT_H */
 
 #ifdef CUNIT_IMPLEMENTATION
-#include <stdlib.h> // malloc, free
-#include <stdio.h> // printf
-#include <unistd.h> // fork
-#include <sys/wait.h> // wait
-#include <signal.h> // signal numbers, macros
-#include <string.h> // strsignal
 
 #include <stdlib.h> // malloc, free
 #include <stdio.h> // printf
@@ -221,6 +215,7 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 
 static long double cunit__internal_fabsl(long double x);
 static void cunit__internal_run_test(const cunit_test_t* test);
+static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test);
 
 cunit_suite_t* suites = NULL;
 cunit_suite_t* last_suite = NULL;
@@ -299,6 +294,7 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
             if ( strcmp(current_suite->name, suiteName) == 0 )
             {
                 cunit__internal_register_test_to_suite(current_suite, test);
+                printf("Registering test %s to suite %s\n", name, suiteName);
                 return;
             }
             else
@@ -323,9 +319,12 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
             .name = suiteName
     };
     cunit__internal_register_test_to_suite(suite, test);
+    printf("Registering test %s to suite %s\n", name, suiteName);
+    printf("Suites %s was not yet created, creating it for test %s. allowed XXX times for XXX = number of suites.\n", suiteName, name);
 
     if (suites == NULL)
     {
+        printf("Suites NULL, initialising suites to suite %s, for test %s\n", suiteName, name);
         suites = suite;
         last_suite = suite;
     }
