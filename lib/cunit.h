@@ -176,6 +176,8 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
 void cunit_run_registered_tests();
 void cunit_free_tests();
 
+void cunit__internal_debug_print_tests_list();
+
 void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName);
 void cunit__internal_register_setup(cunit_func_t func);
 void cunit__internal_register_cleanup(cunit_func_t func);
@@ -233,8 +235,9 @@ cunit_func_t cleanup_onetime_func = NULL;
 #ifndef CUNIT_USE_CUSTOM_MAIN
 int main()
 {
-    cunit_run_registered_tests();
-    cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
+    cunit__internal_debug_print_tests_list();
+    //cunit_run_registered_tests();
+    //cunit_free_tests(); /* This is completely optional as this function also runs in the destructor */
 }
 #endif
 
@@ -294,7 +297,6 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
             if ( strcmp(current_suite->name, suiteName) == 0 )
             {
                 cunit__internal_register_test_to_suite(current_suite, test);
-                printf("Registering test %s to suite %s\n", name, suiteName);
                 return;
             }
             else
@@ -319,12 +321,9 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
             .name = suiteName
     };
     cunit__internal_register_test_to_suite(suite, test);
-    printf("Registering test %s to suite %s\n", name, suiteName);
-    printf("Suites %s was not yet created, creating it for test %s. allowed XXX times for XXX = number of suites.\n", suiteName, name);
 
     if (suites == NULL)
     {
-        printf("Suites NULL, initialising suites to suite %s, for test %s\n", suiteName, name);
         suites = suite;
         last_suite = suite;
     }
@@ -333,7 +332,24 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
         last_suite->list_data.next_node = (cunit_linked_list_t*) suite;
         last_suite = suite;
     }
+}
 
+void cunit__internal_debug_print_tests_list()
+{
+    printf("\n\n");
+    cunit_suite_t* current_suite = suites;
+    while (current_suite != NULL)
+    {
+        printf("Printing tests for suite: %s\n", current_suite->name);
+        cunit_test_t* current_test = current_suite->test_first;
+        while (current_test != NULL)
+        {
+            printf("\t\t%s\n", current_test->name);
+            current_test = (cunit_test_t*) current_test->list_data.next_node;
+        }
+        current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
+    }
+    printf("\n\n");
 }
 
 void cunit__internal_register_setup(cunit_func_t func)
