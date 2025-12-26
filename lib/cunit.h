@@ -102,13 +102,13 @@
 #define CUNIT_EXPECT_PTR_NOT_NULL(a) cunit__internal_assert_ptr_not_null((a), __FILE__, __LINE__, 0)
 
 #define CUNIT_TEST(func)                                    \
-        void _cunit_test_##func(void);                      \
+        static void _cunit_test_##func(void);               \
         __attribute__((constructor))                        \
-        void _cunit_register_##func()                       \
+        static void _cunit_register_##func()                       \
         {                                                   \
             cunit__internal_register_test(_cunit_test_##func, #func, __FILE__); \
         }                                                   \
-        void _cunit_test_##func(void)                       \
+        static void _cunit_test_##func(void)                \
 
 #define CUNIT_SETUP()                           \
         void _cunit_setup(void);                \
