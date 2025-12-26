@@ -254,7 +254,7 @@ static long double cunit__internal_fabsl(long double x)
     }
 }
 
-static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
+inline static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
 {
     cunit_test_t* current_test = suite->test_last;
     if (current_test == NULL)
