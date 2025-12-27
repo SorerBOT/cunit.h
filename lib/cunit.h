@@ -104,7 +104,7 @@
 #define CUNIT_TEST(func)                                    \
         static void _cunit_test_##func(void);               \
         __attribute__((constructor))                        \
-        static void _cunit_register_##func()                       \
+        static void _cunit_register_##func(void)            \
         {                                                   \
             cunit__internal_register_test(_cunit_test_##func, #func, __FILE__); \
         }                                                   \
@@ -113,7 +113,7 @@
 #define CUNIT_SETUP()                           \
         void _cunit_setup(void);                \
         __attribute__((constructor))            \
-        void _cunit_register_setup()            \
+        void _cunit_register_setup(void)        \
         {                                       \
             cunit__internal_register_setup(_cunit_setup); \
         }                                       \
@@ -122,7 +122,7 @@
 #define CUNIT_CLEANUP()                             \
         void _cunit_cleanup(void);                  \
         __attribute__((constructor))                \
-        void _cunit_register_cleanup()              \
+        void _cunit_register_cleanup(void)          \
         {                                           \
             cunit__internal_register_cleanup(_cunit_cleanup); \
         }                                           \
@@ -131,16 +131,16 @@
 #define CUNIT_SETUP_ONETIME()                                   \
         void _cunit_setup_onetime(void);                        \
         __attribute__((constructor))                            \
-        void _cunit_register_setup_onetime()                    \
+        void _cunit_register_setup_onetime(void)                \
         {                                                       \
             cunit__internal_register_setup_onetime(_cunit_setup_onetime); \
         }                                                       \
         void _cunit_setup_onetime(void)
 
 #define CUNIT_CLEANUP_ONETIME()                     \
-        void _cunit_cleanup_onetime(void);                  \
+        void _cunit_cleanup_onetime(void);          \
         __attribute__((constructor))                \
-        void _cunit_register_cleanup_onetime()              \
+        void _cunit_register_cleanup_onetime(void)  \
         {                                           \
             cunit__internal_register_cleanup_onetime(_cunit_cleanup_onetime); \
         }                                           \
@@ -173,10 +173,10 @@ typedef struct
 } cunit_suite_t;
 
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
-void cunit_run_registered_tests();
-void cunit_free_tests();
+void cunit_run_registered_tests(void);
+void cunit_free_tests(void);
 
-void cunit__internal_debug_print_tests_list();
+void cunit__internal_debug_print_tests_list(void);
 
 void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName);
 void cunit__internal_register_setup(cunit_func_t func);
@@ -233,7 +233,7 @@ cunit_func_t setup_onetime_func = NULL;
 cunit_func_t cleanup_onetime_func = NULL;
 
 #ifndef CUNIT_USE_CUSTOM_MAIN
-int main()
+int main(void)
 {
     cunit__internal_debug_print_tests_list();
     cunit_run_registered_tests();
@@ -334,7 +334,7 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
     }
 }
 
-void cunit__internal_debug_print_tests_list()
+void cunit__internal_debug_print_tests_list(void)
 {
     printf("\n\n");
     cunit_suite_t* current_suite = suites;
@@ -393,7 +393,7 @@ void cunit__internal_register_cleanup_onetime(cunit_func_t func)
 }
 
 __attribute__((destructor))
-void cunit_free_tests()
+void cunit_free_tests(void)
 {
     cunit_test_t* test_previous = tests;
     cunit_test_t* test_current = tests;
@@ -528,7 +528,7 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
     printf("\n%lu tests failed out of %lu tests in total\n", tests_count - tests_count_passed, tests_count);
 }
 
-void cunit_run_registered_tests()
+void cunit_run_registered_tests(void)
 {
     tests_count_passed = 0;
     /*
