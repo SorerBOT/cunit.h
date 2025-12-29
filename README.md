@@ -37,6 +37,64 @@ The library defines a default main function, which takes care of running the tes
 ```
 and then add a definition for a `main` function in his own code.
 
+## Available Asseritons:
+The library uses two types of assertions, those starting with `ASSERT` are fatal, and will cause the test to terminate prematurely when failed and those starting with `EXPECT` would only log the error, without causing the test to fail.
+| Fatal Assertion | Non-Fatal Expectation | Description |
+| :--- | :--- | :--- |
+| `CUNIT_ASSERT_TRUE(cond)` | `CUNIT_EXPECT_TRUE(cond)` | Fails if `cond` is 0 (False). |
+| `CUNIT_ASSERT_FALSE(cond)` | `CUNIT_EXPECT_FALSE(cond)` | Fails if `cond` is non-zero (True). |
+
+### Integer Comparisons
+Used for comparing standard integer types.
+
+| Fatal Assertion | Non-Fatal Expectation | Description |
+| :--- | :--- | :--- |
+| `CUNIT_ASSERT_INT_EQ(a, b)` | `CUNIT_EXPECT_INT_EQ(a, b)` | Verifies `a == b` |
+| `CUNIT_ASSERT_INT_NEQ(a, b)` | `CUNIT_EXPECT_INT_NEQ(a, b)` | Verifies `a != b` |
+| `CUNIT_ASSERT_INT_LEQ(a, b)` | `CUNIT_EXPECT_INT_LEQ(a, b)` | Verifies `a <= b` |
+| `CUNIT_ASSERT_INT_LOWER(a, b)` | `CUNIT_EXPECT_INT_LOWER(a, b)` | Verifies `a < b` |
+
+### Floating Point Comparisons
+Used for comparing floats/doubles. 
+* **Standard:** Uses `CUNIT_DEFAULT_THRESHOLD` for precision.
+* **Threshold:** Allows you to specify a custom `threshold` (epsilon/tolerance).
+
+| Fatal Assertion | Non-Fatal Expectation | Description |
+| :--- | :--- | :--- |
+| `CUNIT_ASSERT_FLOAT_EQ(a, b)` | `CUNIT_EXPECT_FLOAT_EQ(a, b)` | Verifies `a` equals `b` (default tolerance). |
+| `CUNIT_ASSERT_FLOAT_EQ_THRESHOLD(a, b, t)` | `CUNIT_EXPECT_FLOAT_EQ_THRESHOLD(a, b, t)` | Verifies `a` equals `b` (tolerance `t`). |
+| `CUNIT_ASSERT_FLOAT_NEQ(a, b)` | `CUNIT_EXPECT_FLOAT_NEQ(a, b)` | Verifies `a` does not equal `b`. |
+| `CUNIT_ASSERT_FLOAT_LEQ(a, b)` | `CUNIT_EXPECT_FLOAT_LEQ(a, b)` | Verifies `a <= b` (default tolerance). |
+| `CUNIT_ASSERT_FLOAT_LEQ_THRESHOLD(a, b, t)` | `CUNIT_EXPECT_FLOAT_LEQ_THRESHOLD(a, b, t)` | Verifies `a <= b` (tolerance `t`). |
+| `CUNIT_ASSERT_FLOAT_LOWER(a, b)` | `CUNIT_EXPECT_FLOAT_LOWER(a, b)` | Verifies `a < b` (default tolerance). |
+| `CUNIT_ASSERT_FLOAT_LOWER_THRESHOLD(a, b, t)` | `CUNIT_EXPECT_FLOAT_LOWER_THRESHOLD(a, b, t)` | Verifies `a < b` (tolerance `t`). |
+
+### String Comparisons
+Used for C-style null-terminated strings (`char*`).
+
+| Fatal Assertion | Non-Fatal Expectation | Description |
+| :--- | :--- | :--- |
+| `CUNIT_ASSERT_STR_EQ(a, b)` | `CUNIT_EXPECT_STR_EQ(a, b)` | Verifies string `a` is identical to string `b`. |
+| `CUNIT_ASSERT_STR_NEQ(a, b)` | `CUNIT_EXPECT_STR_NEQ(a, b)` | Verifies string `a` is different from string `b`. |
+| `CUNIT_ASSERT_STR_CONTAINS(a, b)` | `CUNIT_EXPECT_STR_CONTAINS(a, b)` | Verifies string `a` contains substring `b`. |
+
+### Pointer Comparisons
+Used for checking memory addresses and NULL states.
+
+| Fatal Assertion | Non-Fatal Expectation | Description |
+| :--- | :--- | :--- |
+| `CUNIT_ASSERT_PTR_EQ(a, b)` | `CUNIT_EXPECT_PTR_EQ(a, b)` | Verifies pointer `a` == pointer `b`. |
+| `CUNIT_ASSERT_PTR_NEQ(a, b)` | `CUNIT_EXPECT_PTR_NEQ(a, b)` | Verifies pointer `a` != pointer `b`. |
+| `CUNIT_ASSERT_PTR_NULL(a)` | `CUNIT_EXPECT_PTR_NULL(a)` | Verifies pointer `a` is `NULL`. |
+| `CUNIT_ASSERT_PTR_NOT_NULL(a)` | `CUNIT_EXPECT_PTR_NOT_NULL(a)` | Verifies pointer `a` is not `NULL`. |
+
+### Memory Block Comparisons
+Used for comparing raw blocks of memory (like `memcmp`).
+
+| Fatal Assertion | Non-Fatal Expectation | Description |
+| :--- | :--- | :--- |
+| `CUNIT_ASSERT_MEM_EQ(a, b, size)` | `CUNIT_EXPECT_MEM_EQ(a, b, size)` | Verifies the first `size` bytes of `a` and `b` are identical. |
+| `CUNIT_ASSERT_MEM_NEQ(a, b, size)` | `CUNIT_EXPECT_MEM_NEQ(a, b, size)` | Verifies the first `size` bytes of `a` and `b` are different. |
 
 ## How does it work?
 
