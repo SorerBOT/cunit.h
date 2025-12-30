@@ -2,7 +2,7 @@
 Like NUnit or JUnit, but tiny, and written in C for C development.
 
 ## How do I use it?
-Each tests file represents a single testing-suite. Use the `CUNIT_TEST`, `CUNIT_SETUP`, `CUNIT_CLEANUP`, `CUNIT_SETUP_ONETIME`, `CUNIT_CLEANUP_ONETIME` in order to add tests, a per-test setup function, a per-test cleanup function, a general--one time setup function, and a general--one time cleanup funciton. The setup / cleanup functions are shared between all suites, but I plan to change that soon. Here is how a complete testing suite might look:
+Each tests file represents a single testing-suite. Use the `CUNIT_TEST` macro in order to define a test, and use the macros: `CUNIT_SETUP`, `CUNIT_CLEANUP`, `CUNIT_SETUP_ONETIME`, `CUNIT_CLEANUP_ONETIME` to define functions that would run before and after every test in the current suite (file of tests). Here is how a complete testing suite might look:
 ```c
 CUNIT_SETUP_ONETIME()
 {
