@@ -122,7 +122,7 @@
         __attribute__((constructor))            \
         void _cunit_register_setup(void)        \
         {                                       \
-            cunit__internal_register_setup(_cunit_setup); \
+            cunit__internal_register_setup(_cunit_setup, __FILE__); \
         }                                       \
         void _cunit_setup(void)
 
@@ -177,6 +177,10 @@ typedef struct
     cunit_test_t* test_first;
     cunit_test_t* test_last;
     const char* name;
+    cunit_func_t setup_func;
+    cunit_func_t cleanup_func;
+    cunit_func_t setup_onetime_func;
+    cunit_func_t cleanup_onetime_func;
 } cunit_suite_t;
 
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
@@ -186,7 +190,7 @@ void cunit_free_tests(void);
 void cunit__internal_debug_print_tests_list(void);
 
 void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName);
-void cunit__internal_register_setup(cunit_func_t func);
+void cunit__internal_register_setup(cunit_func_t func, const char* suiteName);
 void cunit__internal_register_cleanup(cunit_func_t func);
 void cunit__internal_register_setup_onetime(cunit_func_t func);
 void cunit__internal_register_cleanup_onetime(cunit_func_t func);
@@ -224,8 +228,9 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #include <poll.h> // poll
 
 static long double cunit__internal_fabsl(long double x);
-static void cunit__internal_run_test(const cunit_test_t* test);
+static cunit_suite_t* cunit__internal_find_suite(const char* suiteName);
 static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test);
+static void cunit__internal_run_test(const cunit_test_t* test);
 
 cunit_suite_t* suites = NULL;
 cunit_suite_t* last_suite = NULL;
@@ -262,7 +267,25 @@ static long double cunit__internal_fabsl(long double x)
     }
 }
 
-inline static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
+static cunit_suite_t* cunit__internal_find_suite(const char* suiteName)
+{
+    cunit_suite_t* current_suite = suites;
+    while (current_suite != NULL)
+    {
+        if ( strcmp(current_suite->name, suiteName) == 0 )
+        {
+            return current_suite;
+        }
+        else
+        {
+            current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
+        }
+    }
+
+    return NULL;
+}
+
+static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
 {
     cunit_test_t* current_test = suite->test_last;
     if (current_test == NULL)
@@ -297,24 +320,15 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
         }
     };
 
-    if (suites != NULL)
+    cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
+
+    if (suite != NULL)
     {
-        cunit_suite_t* current_suite = suites;
-        while (current_suite != NULL)
-        {
-            if ( strcmp(current_suite->name, suiteName) == 0 )
-            {
-                cunit__internal_register_test_to_suite(current_suite, test);
-                return;
-            }
-            else
-            {
-                current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
-            }
-        }
+        cunit__internal_register_test_to_suite(suite, test);
+        return;
     }
 
-    cunit_suite_t* suite = malloc(sizeof(cunit_suite_t));
+    suite = malloc(sizeof(cunit_suite_t));
     if (suite == NULL)
     {
         fprintf(stderr, "malloc()");
@@ -360,7 +374,7 @@ void cunit__internal_debug_print_tests_list(void)
     printf("\n\n");
 }
 
-void cunit__internal_register_setup(cunit_func_t func)
+void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
 {
     if (setup_func != NULL)
     {
