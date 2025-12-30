@@ -27,12 +27,20 @@ CUNIT_TEST(str_eq)
     CUNIT_EXPECT_STR_NEQ(NULL, NULL);
 }
 ```
-
+## When does a test timeout?
+The default timeout duration is 3 seconds. However that can easily be changed by defining:
+```c
+#define CUNIT_USER_TIMEOUT_MS 10000 // <-- insert your timeout in miliseconds, e.g: 10000 for 10 seconds
+...
+#define CUNIT_IMPLEMENTATION
+#include ".../cunit.h"
+```
 ## What if I want to define my own main function?
 The library defines a default main function, which takes care of running the tests and de-allocating memory (de-allocating memory also happens in the destructor) and runs it without requiring the user to do anything. Should the user wish to define his own, custom main function (even though I cannot seem to find any probable reason for him to wish to do so), he may simply define:
 ```c
 #define CUNIT_USE_CUSTOM_MAIN
 ...
+#define CUNIT_IMPLEMENTATION
 #include ".../cunit.h"
 ```
 and then add a definition for a `main` function in his own code.
