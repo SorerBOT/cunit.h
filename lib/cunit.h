@@ -228,6 +228,8 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #include <poll.h> // poll
 
 static long double cunit__internal_fabsl(long double x);
+static cunit_suite_t* cunit__internal_init_suite(const char* suiteName);
+static void cunit__internal_register_suite(cunit_suite_t* suite);
 static cunit_suite_t* cunit__internal_find_suite(const char* suiteName);
 static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test);
 static void cunit__internal_run_test(const cunit_test_t* test);
@@ -264,6 +266,53 @@ static long double cunit__internal_fabsl(long double x)
     else
     {
         return -x;
+    }
+}
+
+static cunit_suite_t* cunit__internal_init_suite(const char* suiteName)
+{
+    cunit_suite_t* suite = malloc(sizeof(cunit_suite_t));
+    if (suite == NULL)
+    {
+        fprintf(stderr, "malloc()");
+        exit(EXIT_FAILURE);
+    }
+
+    *suite = (cunit_suite_t)
+    {
+        .list_data = (cunit_linked_list_t)
+        {
+            .next_node = NULL
+        },
+        .name = suiteName,
+        .setup_func = NULL,
+        .setup_onetime_func = NULL,
+        .cleanup_func = NULL,
+        .cleanup_onetime_func = NULL,
+        .test_first = NULL,
+        .test_last = NULL
+    };
+
+    return suite;
+}
+
+static void cunit__internal_register_suite(cunit_suite_t* suite)
+{
+    if (cunit__internal_find_suite(suite->name))
+    {
+        fprintf(stderr, "Cannot create multiple suites with the same name.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (suites == NULL)
+    {
+        suites = suite;
+        last_suite = suite;
+    }
+    else
+    {
+        last_suite->list_data.next_node = (cunit_linked_list_t*) suite;
+        last_suite = suite;
     }
 }
 
@@ -328,32 +377,9 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
         return;
     }
 
-    suite = malloc(sizeof(cunit_suite_t));
-    if (suite == NULL)
-    {
-        fprintf(stderr, "malloc()");
-        exit(EXIT_FAILURE);
-    }
-    *suite = (cunit_suite_t)
-    {
-        .list_data = (cunit_linked_list_t)
-        {
-            .next_node = NULL
-        },
-            .name = suiteName
-    };
+    suite = cunit__internal_init_suite(suiteName);
     cunit__internal_register_test_to_suite(suite, test);
-
-    if (suites == NULL)
-    {
-        suites = suite;
-        last_suite = suite;
-    }
-    else
-    {
-        last_suite->list_data.next_node = (cunit_linked_list_t*) suite;
-        last_suite = suite;
-    }
+    cunit__internal_register_suite(suite);
 }
 
 void cunit__internal_debug_print_tests_list(void)
@@ -376,12 +402,22 @@ void cunit__internal_debug_print_tests_list(void)
 
 void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
 {
-    if (setup_func != NULL)
+    cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
+
+    if (suite != NULL)
     {
-        fprintf(stderr, "setup function redefinition is not allowed.\n");
-        exit(EXIT_FAILURE);
+        if (suite->setup_func != NULL)
+        {
+            fprintf(stderr, "setup function redefinition is not allowed.\n");
+            exit(EXIT_FAILURE);
+        }
+        setup_func = func;
+        return;
     }
-    setup_func = func;
+
+    suite = cunit__internal_init_suite(suiteName);
+    suite->setup_func = setup_func;
+
 }
 
 void cunit__internal_register_cleanup(cunit_func_t func)
