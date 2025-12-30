@@ -149,7 +149,7 @@
         __attribute__((constructor))                \
         void _cunit_register_cleanup_onetime(void)  \
         {                                           \
-            cunit__internal_register_cleanup_onetime(_cunit_cleanup_onetime); \
+            cunit__internal_register_func(_cunit_cleanup_onetime, CUNIT_FT_CLEANUP_ONETIME, __FILE__); \
         }                                           \
         void _cunit_cleanup_onetime(void)
 
@@ -697,20 +697,20 @@ void cunit_run_registered_tests(void)
             current_test = (cunit_test_t*) current_test->list_data.next_node;
         }
 
+        /*
+         * CleanUpOneTime
+         */
+        if (current_suite->cleanup_onetime_func != NULL)
+        {
+
+            printf("**** Running CleanUpOneTime function....\n");
+            fflush(NULL);
+            current_suite->cleanup_onetime_func();
+            printf("**** CleanUpOneTime function finished successfully....\n");
+        }
+        printf("============================================\n");
+
         current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
-    }
-    printf("============================================\n");
-
-    /*
-     * CleanUpOneTime
-     */
-    if (cleanup_onetime_func != NULL)
-    {
-
-        printf("**** Running CleanUpOneTime function....\n");
-        fflush(NULL);
-        cleanup_onetime_func();
-        printf("**** CleanUpOneTime function finished successfully....\n");
     }
 
     /*
