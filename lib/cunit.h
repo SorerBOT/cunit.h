@@ -140,7 +140,7 @@
         __attribute__((constructor))                            \
         void _cunit_register_setup_onetime(void)                \
         {                                                       \
-            cunit__internal_register_setup_onetime(_cunit_setup_onetime); \
+            cunit__internal_register_func(_cunit_setup_onetime, CUNIT_FT_SETUP_ONETIME, __FILE__); \
         }                                                       \
         void _cunit_setup_onetime(void)
 
@@ -674,18 +674,18 @@ void cunit_run_registered_tests(void)
     /*
      * SetUpOneTime
      */
-    if (setup_onetime_func != NULL)
-    {
-        printf("**** Running SetUpOneTime function....\n");
-        fflush(NULL);
-        setup_onetime_func();
-        printf("**** SetUpOneTime function finished successfully....\n");
-    }
-
     cunit_suite_t* current_suite = suites;
     while (current_suite != NULL)
     {
         printf("============================================\n");
+        if (current_suite->setup_onetime_func != NULL)
+        {
+            printf("**** Running SetUpOneTime function....\n");
+            fflush(NULL);
+            current_suite->setup_onetime_func();
+            printf("**** SetUpOneTime function finished successfully....\n");
+        }
+
         printf("Running tests in suite: %s\n", current_suite->name);
 
         cunit_test_t* current_test = current_suite->test_first;
