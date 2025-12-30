@@ -336,8 +336,7 @@ static cunit_suite_t* cunit__internal_find_suite(const char* suiteName)
 
 static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
 {
-    cunit_test_t* current_test = suite->test_last;
-    if (current_test == NULL)
+    if (suite->test_last == NULL)
     {
         suite->test_first = test;
         suite->test_last = test;
