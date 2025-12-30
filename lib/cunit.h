@@ -232,7 +232,7 @@ static cunit_suite_t* cunit__internal_init_suite(const char* suiteName);
 static void cunit__internal_register_suite(cunit_suite_t* suite);
 static cunit_suite_t* cunit__internal_find_suite(const char* suiteName);
 static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test);
-static void cunit__internal_run_test(const cunit_test_t* test);
+static void cunit__internal_run_test(const cunit_suite_t* suite, const cunit_test_t* test);
 
 cunit_suite_t* suites = NULL;
 cunit_suite_t* last_suite = NULL;
@@ -403,7 +403,6 @@ void cunit__internal_debug_print_tests_list(void)
 void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
 {
     cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
-
     if (suite != NULL)
     {
         if (suite->setup_func != NULL)
@@ -411,13 +410,12 @@ void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
             fprintf(stderr, "setup function redefinition is not allowed.\n");
             exit(EXIT_FAILURE);
         }
-        setup_func = func;
+        suite->setup_func = func;
         return;
     }
 
     suite = cunit__internal_init_suite(suiteName);
-    suite->setup_func = setup_func;
-
+    suite->setup_func = func;
 }
 
 void cunit__internal_register_cleanup(cunit_func_t func)
@@ -473,16 +471,16 @@ void cunit_free_tests(void)
     tests = NULL;
 }
 
-static void cunit__internal_run_test(const cunit_test_t* test)
+static void cunit__internal_run_test(const cunit_suite_t* suite, const cunit_test_t* test)
 {
     /*
      * SETUP
      */
-    if (setup_func != NULL)
+    if (suite->setup_func != NULL)
     {
         printf("**** Running SetUp function....\n");
         fflush(NULL);
-        setup_func();
+        suite->setup_func();
         printf("**** SetUp finished successfully....\n");
         fflush(NULL);
     }
@@ -600,7 +598,7 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
         printf("============================================\n");
         printf("Running test: %s\n", tests[i].name);
         fflush(NULL);
-        cunit__internal_run_test(&tests[i]);
+        //cunit__internal_run_test(&tests[i], NULL); // Not supporting this anymore, for now at least...
     }
     printf("============================================\n");
 
@@ -651,7 +649,7 @@ void cunit_run_registered_tests(void)
         {
             printf("Running test: %s\n", current_test->name);
             fflush(NULL);
-            cunit__internal_run_test(current_test);
+            cunit__internal_run_test(current_suite, current_test);
             current_test = (cunit_test_t*) current_test->list_data.next_node;
         }
 
