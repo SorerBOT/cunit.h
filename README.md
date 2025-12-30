@@ -1,5 +1,5 @@
 # cunit.h
-Like NUnit or JUnit, but tiny **header onlu**, and written in C for C development.
+Like NUnit or JUnit, but tiny **header only**, and written in C for C development.
 
 ## How do I use it?
 Each tests file represents a single testing-suite. Use the `CUNIT_TEST` macro in order to define a test, and use the macros: `CUNIT_SETUP`, `CUNIT_CLEANUP`, `CUNIT_SETUP_ONETIME`, `CUNIT_CLEANUP_ONETIME` to define functions that would run before and after every test in the current suite (file of tests). Here is how a complete testing suite might look:
@@ -35,7 +35,7 @@ CUNIT_TEST(str_eq)
 ## When does a test timeout?
 The default timeout duration is 3 seconds. However that can easily be changed by defining:
 ```c
-#define CUNIT_USER_TIMEOUT_MS 10000 // <-- insert your timeout in miliseconds, e.g: 10000 for 10 seconds
+#define CUNIT_USER_TIMEOUT_MS 10000 // <-- insert your timeout in milliseconds, e.g: 10000 for 10 seconds
 ...
 #define CUNIT_IMPLEMENTATION
 #include ".../cunit.h"
@@ -50,7 +50,7 @@ The library defines a default main function, which takes care of running the tes
 ```
 and then add a definition for a `main` function in his own code.
 
-## Available Asseritons:
+## Available Assertions:
 The library uses two types of assertions, those starting with `ASSERT` are fatal, and will cause the test to terminate prematurely when failed and those starting with `EXPECT` would only log the error, without causing the test to fail.
 | Fatal Assertion | Non-Fatal Expectation | Description |
 | :--- | :--- | :--- |
