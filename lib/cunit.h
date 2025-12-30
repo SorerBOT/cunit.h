@@ -131,7 +131,7 @@
         __attribute__((constructor))                \
         void _cunit_register_cleanup(void)          \
         {                                           \
-            cunit__internal_register_cleanup(_cunit_cleanup); \
+            cunit__internal_register_func(_cunit_cleanup, CUNIT_FT_CLEANUP, __FILE__); \
         }                                           \
         void _cunit_cleanup(void)
 
@@ -613,11 +613,11 @@ static void cunit__internal_run_test(const cunit_suite_t* suite, const cunit_tes
         /*
          * Clean Up
          */
-        if (cleanup_func != NULL)
+        if (suite->cleanup_func != NULL)
         {
             printf("**** Running CleanUp function....\n");
             fflush(NULL);
-            cleanup_func();
+            suite->cleanup_func();
             printf("**** CleanUp finished successfully....\n");
         }
     }
