@@ -1,5 +1,5 @@
 # cunit.h
-Like NUnit or JUnit, but tiny, and written in C for C development.
+Like NUnit or JUnit, but tiny **header onlu**, and written in C for C development.
 
 ## How do I use it?
 Each tests file represents a single testing-suite. Use the `CUNIT_TEST` macro in order to define a test, and use the macros: `CUNIT_SETUP`, `CUNIT_CLEANUP`, `CUNIT_SETUP_ONETIME`, `CUNIT_CLEANUP_ONETIME` to define functions that would run before and after every test in the current suite (file of tests). Here is how a complete testing suite might look:
