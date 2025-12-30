@@ -472,11 +472,15 @@ static void cunit__internal_run_test(const cunit_test_t* test)
             perror("poll()");
             exit(EXIT_FAILURE);
         }
-        else if (timeout_result == 0)
-        {
-            /* poll() timed out, the child has to be terminated. */
-            kill(child_process_pid, SIGKILL);
-        }
+        /*
+         * if poll() timed out, the child has to be terminated.
+         * else, the child is already dead and this is a no-op:
+         *    ESRCH  The target process or process group does not exist.  Note
+         *    that an existing process might be a zombie, a process that
+         *    has terminated execution, but has not yet been wait(2)ed
+         *    for. <===== from the kill() man page.
+         */
+        kill(child_process_pid, SIGKILL);
 
         /* Child is now dead, either exited, or killed. */
 
