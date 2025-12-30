@@ -127,31 +127,31 @@
         static void _cunit_setup(void)
 
 #define CUNIT_CLEANUP()                             \
-        void _cunit_cleanup(void);                  \
+        static void _cunit_cleanup(void);                  \
         __attribute__((constructor))                \
-        void _cunit_register_cleanup(void)          \
+        static void _cunit_register_cleanup(void)          \
         {                                           \
             cunit__internal_register_func(_cunit_cleanup, CUNIT_FT_CLEANUP, __FILE__); \
         }                                           \
-        void _cunit_cleanup(void)
+        static void _cunit_cleanup(void)
 
 #define CUNIT_SETUP_ONETIME()                                   \
-        void _cunit_setup_onetime(void);                        \
+        static void _cunit_setup_onetime(void);                        \
         __attribute__((constructor))                            \
-        void _cunit_register_setup_onetime(void)                \
+        static void _cunit_register_setup_onetime(void)                \
         {                                                       \
             cunit__internal_register_func(_cunit_setup_onetime, CUNIT_FT_SETUP_ONETIME, __FILE__); \
         }                                                       \
-        void _cunit_setup_onetime(void)
+        static void _cunit_setup_onetime(void)
 
 #define CUNIT_CLEANUP_ONETIME()                     \
-        void _cunit_cleanup_onetime(void);          \
+        static void _cunit_cleanup_onetime(void);          \
         __attribute__((constructor))                \
-        void _cunit_register_cleanup_onetime(void)  \
+        static void _cunit_register_cleanup_onetime(void)  \
         {                                           \
             cunit__internal_register_func(_cunit_cleanup_onetime, CUNIT_FT_CLEANUP_ONETIME, __FILE__); \
         }                                           \
-        void _cunit_cleanup_onetime(void)
+        static void _cunit_cleanup_onetime(void)
 
 typedef enum
 {
