@@ -1,6 +1,9 @@
 # cunit.h
 Like NUnit or JUnit, but tiny **header only**, and written in C for C development.
-
+## Top Features
+* Header Only: the library file is single and ready to mingle!
+* Process Isolation: each test runs in an isolated process, allowing all tests to run even if one of them crashed.
+* Automatic Registration: suites, and tests are registered automatically. **No need for a `main()` function**
 ## How do I use it?
 Each tests file represents a single testing-suite. Use the `CUNIT_TEST` macro in order to define a test, and use the macros: `CUNIT_SETUP`, `CUNIT_CLEANUP`, `CUNIT_SETUP_ONETIME`, `CUNIT_CLEANUP_ONETIME` to define functions that would run before and after every test in the current suite (file of tests). Here is how a complete testing suite might look:
 ```c
@@ -139,6 +142,7 @@ There's a bit to unpack here, but mostly what it does is:
 4. Then create the actual function `func`. The body of the function is what follows the macro invocation.
 
 
-If this did not bring a smile to your face, I don't know what would ;)
+If this _magic_ did not bring a smile to your face, I don't know what would ;)  
+(*) _in practice, I use static and other tiny alterations to allow defining multiple tests with the same name under different suites, but the above is the gist of it_
 ## Test Running
 Each test is ran in a different process, in order to minimise friction between the tests.
