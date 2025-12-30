@@ -401,7 +401,6 @@ void cunit__internal_debug_print_tests_list(void)
 
 void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
 {
-    printf("registering a setup function for suite %s\n", suiteName);
     cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
     if (suite != NULL)
     {
@@ -411,13 +410,12 @@ void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
             exit(EXIT_FAILURE);
         }
         suite->setup_func = func;
-        printf("finished registering a setup function for suite %s\n", suiteName);
         return;
     }
 
     suite = cunit__internal_init_suite(suiteName);
     suite->setup_func = func;
-    printf("finished registering a setup function for suite %s\n", suiteName);
+    cunit__internal_register_suite(suite);
 }
 
 void cunit__internal_register_cleanup(cunit_func_t func)
