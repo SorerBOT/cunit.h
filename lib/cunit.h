@@ -118,13 +118,13 @@
         static void _cunit_test_##func(void)                \
 
 #define CUNIT_SETUP()                           \
-        void _cunit_setup(void);                \
+        static void _cunit_setup(void);                \
         __attribute__((constructor))            \
-        void _cunit_register_setup(void)        \
+        static void _cunit_register_setup(void)        \
         {                                       \
             cunit__internal_register_setup(_cunit_setup, __FILE__); \
         }                                       \
-        void _cunit_setup(void)
+        static void _cunit_setup(void)
 
 #define CUNIT_CLEANUP()                             \
         void _cunit_cleanup(void);                  \
@@ -384,7 +384,7 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
 
 void cunit__internal_debug_print_tests_list(void)
 {
-    printf("\n\n");
+    printf("\n");
     cunit_suite_t* current_suite = suites;
     while (current_suite != NULL)
     {
@@ -397,11 +397,12 @@ void cunit__internal_debug_print_tests_list(void)
         }
         current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
     }
-    printf("\n\n");
+    printf("\n");
 }
 
 void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
 {
+    printf("registering a setup function for suite %s\n", suiteName);
     cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
     if (suite != NULL)
     {
@@ -411,11 +412,13 @@ void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
             exit(EXIT_FAILURE);
         }
         suite->setup_func = func;
+        printf("finished registering a setup function for suite %s\n", suiteName);
         return;
     }
 
     suite = cunit__internal_init_suite(suiteName);
     suite->setup_func = func;
+    printf("finished registering a setup function for suite %s\n", suiteName);
 }
 
 void cunit__internal_register_cleanup(cunit_func_t func)
