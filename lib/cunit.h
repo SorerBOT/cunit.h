@@ -118,40 +118,49 @@
         static void _cunit_test_##func(void)                \
 
 #define CUNIT_SETUP()                           \
-        void _cunit_setup(void);                \
+        static void _cunit_setup(void);                \
         __attribute__((constructor))            \
-        void _cunit_register_setup(void)        \
+        static void _cunit_register_setup(void)        \
         {                                       \
-            cunit__internal_register_setup(_cunit_setup); \
+            cunit__internal_register_func(_cunit_setup, CUNIT_FT_SETUP, __FILE__); \
         }                                       \
-        void _cunit_setup(void)
+        static void _cunit_setup(void)
 
 #define CUNIT_CLEANUP()                             \
-        void _cunit_cleanup(void);                  \
+        static void _cunit_cleanup(void);                  \
         __attribute__((constructor))                \
-        void _cunit_register_cleanup(void)          \
+        static void _cunit_register_cleanup(void)          \
         {                                           \
-            cunit__internal_register_cleanup(_cunit_cleanup); \
+            cunit__internal_register_func(_cunit_cleanup, CUNIT_FT_CLEANUP, __FILE__); \
         }                                           \
-        void _cunit_cleanup(void)
+        static void _cunit_cleanup(void)
 
 #define CUNIT_SETUP_ONETIME()                                   \
-        void _cunit_setup_onetime(void);                        \
+        static void _cunit_setup_onetime(void);                        \
         __attribute__((constructor))                            \
-        void _cunit_register_setup_onetime(void)                \
+        static void _cunit_register_setup_onetime(void)                \
         {                                                       \
-            cunit__internal_register_setup_onetime(_cunit_setup_onetime); \
+            cunit__internal_register_func(_cunit_setup_onetime, CUNIT_FT_SETUP_ONETIME, __FILE__); \
         }                                                       \
-        void _cunit_setup_onetime(void)
+        static void _cunit_setup_onetime(void)
 
 #define CUNIT_CLEANUP_ONETIME()                     \
-        void _cunit_cleanup_onetime(void);          \
+        static void _cunit_cleanup_onetime(void);          \
         __attribute__((constructor))                \
-        void _cunit_register_cleanup_onetime(void)  \
+        static void _cunit_register_cleanup_onetime(void)  \
         {                                           \
-            cunit__internal_register_cleanup_onetime(_cunit_cleanup_onetime); \
+            cunit__internal_register_func(_cunit_cleanup_onetime, CUNIT_FT_CLEANUP_ONETIME, __FILE__); \
         }                                           \
-        void _cunit_cleanup_onetime(void)
+        static void _cunit_cleanup_onetime(void)
+
+typedef enum
+{
+    CUNIT_FT_TEST,
+    CUNIT_FT_SETUP,
+    CUNIT_FT_CLEANUP,
+    CUNIT_FT_SETUP_ONETIME,
+    CUNIT_FT_CLEANUP_ONETIME
+} cunit_func_type_t;
 
 typedef void(*cunit_func_t)(void);
 
@@ -177,6 +186,10 @@ typedef struct
     cunit_test_t* test_first;
     cunit_test_t* test_last;
     const char* name;
+    cunit_func_t setup_func;
+    cunit_func_t cleanup_func;
+    cunit_func_t setup_onetime_func;
+    cunit_func_t cleanup_onetime_func;
 } cunit_suite_t;
 
 void cunit_run_tests(const cunit_test_t* tests, size_t tests_count);
@@ -186,7 +199,7 @@ void cunit_free_tests(void);
 void cunit__internal_debug_print_tests_list(void);
 
 void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName);
-void cunit__internal_register_setup(cunit_func_t func);
+void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName);
 void cunit__internal_register_cleanup(cunit_func_t func);
 void cunit__internal_register_setup_onetime(cunit_func_t func);
 void cunit__internal_register_cleanup_onetime(cunit_func_t func);
@@ -224,8 +237,11 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #include <poll.h> // poll
 
 static long double cunit__internal_fabsl(long double x);
-static void cunit__internal_run_test(const cunit_test_t* test);
+static cunit_suite_t* cunit__internal_init_suite(const char* suiteName);
+static void cunit__internal_register_suite(cunit_suite_t* suite);
+static cunit_suite_t* cunit__internal_find_suite(const char* suiteName);
 static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test);
+static void cunit__internal_run_test(const cunit_suite_t* suite, const cunit_test_t* test);
 
 cunit_suite_t* suites = NULL;
 cunit_suite_t* last_suite = NULL;
@@ -262,10 +278,74 @@ static long double cunit__internal_fabsl(long double x)
     }
 }
 
-inline static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
+static cunit_suite_t* cunit__internal_init_suite(const char* suiteName)
 {
-    cunit_test_t* current_test = suite->test_last;
-    if (current_test == NULL)
+    cunit_suite_t* suite = malloc(sizeof(cunit_suite_t));
+    if (suite == NULL)
+    {
+        fprintf(stderr, "malloc()");
+        exit(EXIT_FAILURE);
+    }
+
+    *suite = (cunit_suite_t)
+    {
+        .list_data = (cunit_linked_list_t)
+        {
+            .next_node = NULL
+        },
+        .name = suiteName,
+        .setup_func = NULL,
+        .setup_onetime_func = NULL,
+        .cleanup_func = NULL,
+        .cleanup_onetime_func = NULL,
+        .test_first = NULL,
+        .test_last = NULL
+    };
+
+    return suite;
+}
+
+static void cunit__internal_register_suite(cunit_suite_t* suite)
+{
+    if (cunit__internal_find_suite(suite->name))
+    {
+        fprintf(stderr, "Cannot create multiple suites with the same name.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (suites == NULL)
+    {
+        suites = suite;
+        last_suite = suite;
+    }
+    else
+    {
+        last_suite->list_data.next_node = (cunit_linked_list_t*) suite;
+        last_suite = suite;
+    }
+}
+
+static cunit_suite_t* cunit__internal_find_suite(const char* suiteName)
+{
+    cunit_suite_t* current_suite = suites;
+    while (current_suite != NULL)
+    {
+        if ( strcmp(current_suite->name, suiteName) == 0 )
+        {
+            return current_suite;
+        }
+        else
+        {
+            current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
+        }
+    }
+
+    return NULL;
+}
+
+static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
+{
+    if (suite->test_last == NULL)
     {
         suite->test_first = test;
         suite->test_last = test;
@@ -297,54 +377,22 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
         }
     };
 
-    if (suites != NULL)
+    cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
+
+    if (suite != NULL)
     {
-        cunit_suite_t* current_suite = suites;
-        while (current_suite != NULL)
-        {
-            if ( strcmp(current_suite->name, suiteName) == 0 )
-            {
-                cunit__internal_register_test_to_suite(current_suite, test);
-                return;
-            }
-            else
-            {
-                current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
-            }
-        }
+        cunit__internal_register_test_to_suite(suite, test);
+        return;
     }
 
-    cunit_suite_t* suite = malloc(sizeof(cunit_suite_t));
-    if (suite == NULL)
-    {
-        fprintf(stderr, "malloc()");
-        exit(EXIT_FAILURE);
-    }
-    *suite = (cunit_suite_t)
-    {
-        .list_data = (cunit_linked_list_t)
-        {
-            .next_node = NULL
-        },
-            .name = suiteName
-    };
+    suite = cunit__internal_init_suite(suiteName);
     cunit__internal_register_test_to_suite(suite, test);
-
-    if (suites == NULL)
-    {
-        suites = suite;
-        last_suite = suite;
-    }
-    else
-    {
-        last_suite->list_data.next_node = (cunit_linked_list_t*) suite;
-        last_suite = suite;
-    }
+    cunit__internal_register_suite(suite);
 }
 
 void cunit__internal_debug_print_tests_list(void)
 {
-    printf("\n\n");
+    printf("\n");
     cunit_suite_t* current_suite = suites;
     while (current_suite != NULL)
     {
@@ -357,17 +405,61 @@ void cunit__internal_debug_print_tests_list(void)
         }
         current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
     }
-    printf("\n\n");
+    printf("\n");
 }
 
-void cunit__internal_register_setup(cunit_func_t func)
+void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName)
 {
-    if (setup_func != NULL)
+    cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
+    if (suite == NULL)
     {
-        fprintf(stderr, "setup function redefinition is not allowed.\n");
+        suite = cunit__internal_init_suite(suiteName);
+        cunit__internal_register_suite(suite);
+    }
+
+    cunit_func_t* current_func_addr;
+    char* func_type_name;
+
+    switch (func_type)
+    {
+        case (CUNIT_FT_TEST):
+            func_type_name = "TEST";
+            break;
+        case (CUNIT_FT_SETUP):
+            current_func_addr = &suite->setup_func;
+            func_type_name = "SETUP";
+            break;
+        case (CUNIT_FT_CLEANUP):
+            current_func_addr = &suite->cleanup_func;
+            func_type_name = "CLEANUP";
+            break;
+        case (CUNIT_FT_SETUP_ONETIME):
+            current_func_addr = &suite->setup_onetime_func;
+            func_type_name = "SETUP_ONETIME";
+            break;
+        case (CUNIT_FT_CLEANUP_ONETIME):
+            current_func_addr = &suite->cleanup_onetime_func;
+            func_type_name = "CLEANUP_ONETIME";
+            break;
+        default:
+            current_func_addr = NULL;
+            func_type_name = "UNKNOWN FUNCTION";
+            break;
+    }
+
+    if (current_func_addr == NULL)
+    {
+        fprintf(stderr, "Enum value %d is out of range for cunit_func_type_t.\n", func_type);
         exit(EXIT_FAILURE);
     }
-    setup_func = func;
+
+    if (*current_func_addr != NULL)
+    {
+        fprintf(stderr, "%s function redefinition is not allowed.\n", func_type_name);
+        exit(EXIT_FAILURE);
+    }
+
+    *current_func_addr = func;
 }
 
 void cunit__internal_register_cleanup(cunit_func_t func)
@@ -423,16 +515,16 @@ void cunit_free_tests(void)
     tests = NULL;
 }
 
-static void cunit__internal_run_test(const cunit_test_t* test)
+static void cunit__internal_run_test(const cunit_suite_t* suite, const cunit_test_t* test)
 {
     /*
      * SETUP
      */
-    if (setup_func != NULL)
+    if (suite->setup_func != NULL)
     {
         printf("**** Running SetUp function....\n");
         fflush(NULL);
-        setup_func();
+        suite->setup_func();
         printf("**** SetUp finished successfully....\n");
         fflush(NULL);
     }
@@ -521,11 +613,11 @@ static void cunit__internal_run_test(const cunit_test_t* test)
         /*
          * Clean Up
          */
-        if (cleanup_func != NULL)
+        if (suite->cleanup_func != NULL)
         {
             printf("**** Running CleanUp function....\n");
             fflush(NULL);
-            cleanup_func();
+            suite->cleanup_func();
             printf("**** CleanUp finished successfully....\n");
         }
     }
@@ -550,7 +642,7 @@ void cunit_run_tests(const cunit_test_t* tests, size_t tests_count)
         printf("============================================\n");
         printf("Running test: %s\n", tests[i].name);
         fflush(NULL);
-        cunit__internal_run_test(&tests[i]);
+        //cunit__internal_run_test(&tests[i], NULL); // Not supporting this anymore, for now at least...
     }
     printf("============================================\n");
 
@@ -582,18 +674,18 @@ void cunit_run_registered_tests(void)
     /*
      * SetUpOneTime
      */
-    if (setup_onetime_func != NULL)
-    {
-        printf("**** Running SetUpOneTime function....\n");
-        fflush(NULL);
-        setup_onetime_func();
-        printf("**** SetUpOneTime function finished successfully....\n");
-    }
-
     cunit_suite_t* current_suite = suites;
     while (current_suite != NULL)
     {
         printf("============================================\n");
+        if (current_suite->setup_onetime_func != NULL)
+        {
+            printf("**** Running SetUpOneTime function....\n");
+            fflush(NULL);
+            current_suite->setup_onetime_func();
+            printf("**** SetUpOneTime function finished successfully....\n");
+        }
+
         printf("Running tests in suite: %s\n", current_suite->name);
 
         cunit_test_t* current_test = current_suite->test_first;
@@ -601,24 +693,24 @@ void cunit_run_registered_tests(void)
         {
             printf("Running test: %s\n", current_test->name);
             fflush(NULL);
-            cunit__internal_run_test(current_test);
+            cunit__internal_run_test(current_suite, current_test);
             current_test = (cunit_test_t*) current_test->list_data.next_node;
         }
 
+        /*
+         * CleanUpOneTime
+         */
+        if (current_suite->cleanup_onetime_func != NULL)
+        {
+
+            printf("**** Running CleanUpOneTime function....\n");
+            fflush(NULL);
+            current_suite->cleanup_onetime_func();
+            printf("**** CleanUpOneTime function finished successfully....\n");
+        }
+        printf("============================================\n");
+
         current_suite = (cunit_suite_t*) current_suite->list_data.next_node;
-    }
-    printf("============================================\n");
-
-    /*
-     * CleanUpOneTime
-     */
-    if (cleanup_onetime_func != NULL)
-    {
-
-        printf("**** Running CleanUpOneTime function....\n");
-        fflush(NULL);
-        cleanup_onetime_func();
-        printf("**** CleanUpOneTime function finished successfully....\n");
     }
 
     /*

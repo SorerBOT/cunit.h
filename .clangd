@@ -1,5 +1,10 @@
 CompileFlags:
   Add: 
+    # Force the language to C (Fixes "C++ errors" in .h files)
+    - -x
+    - c
+    # Set the standard to C99
+    - -std=c99
     - -DCUNIT_IMPLEMENTATION
     - -Iexternal
     - -Iinclude
