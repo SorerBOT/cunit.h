@@ -32,6 +32,11 @@
 #else
 #define CUNIT_DEFAULT_THRESHOLD 0.0001
 #endif
+#ifdef CUNIT_USER_TIMEOUT_MS
+#define CUNIT_TIMEOUT_MS CUNIT_USER_TIMEOUT_MS
+#else
+#define CUNIT_TIMEOUT_MS 10000
+#endif
 
 #define CUNIT_ASSERT_TRUE(condition) cunit__internal_assert_true((condition), (#condition), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_TRUE(condition) cunit__internal_assert_true((condition), (#condition), __FILE__, __LINE__, 0)
@@ -214,6 +219,7 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #include <sys/wait.h> // wait
 #include <signal.h> // signal numbers, macros
 #include <string.h> // strsignal
+#include <poll.h> // poll
 
 static long double cunit__internal_fabsl(long double x);
 static void cunit__internal_run_test(const cunit_test_t* test);
@@ -429,9 +435,15 @@ static void cunit__internal_run_test(const cunit_test_t* test)
         fflush(NULL);
     }
 
-    /*
-     * Running Test
-     */
+    /* Running Test, using Self-Piping for Timeouts */
+    int timeout_pipe_fd[2] = { 0 };
+    if (pipe(timeout_pipe_fd) == -1)
+    {
+        perror("pipe()");
+        exit(EXIT_FAILURE);
+    }
+
+
     pid_t child_process_pid = fork();
     if (child_process_pid == -1)
     {
@@ -440,22 +452,49 @@ static void cunit__internal_run_test(const cunit_test_t* test)
     }
     if (child_process_pid == 0)
     {
+        close(timeout_pipe_fd[0]); /* Closing the read end of the pipe */
         test->func();
         _exit(EXIT_SUCCESS);
     }
     else
     {
-        int stat_loc = 0;
-        waitpid(child_process_pid, &stat_loc, 0);
-        if (WIFEXITED(stat_loc))
+        close(timeout_pipe_fd[1]); /* Closing the write end of the pipe */
+
+        struct pollfd timeout_pipe_fd_for_poll =
+        {
+            .fd = timeout_pipe_fd[0],
+            .events = POLLHUP | POLLIN
+        };
+
+        int timeout_result = poll(&timeout_pipe_fd_for_poll, 1, CUNIT_TIMEOUT_MS);
+        if (timeout_result == -1)
+        {
+            perror("poll()");
+            exit(EXIT_FAILURE);
+        }
+        else if (timeout_result == 0)
+        {
+            /* poll() timed out, the child has to be terminated. */
+            kill(child_process_pid, SIGKILL);
+        }
+
+        /* Child is now dead, either exited, or killed. */
+
+        int status = 0;
+        waitpid(child_process_pid, &status, 0);
+        if (WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS)
         {
             ++tests_count_passed;
         }
-        else if (WIFSIGNALED(stat_loc))
+        else if (WIFSIGNALED(status))
         {
-            int signal = WTERMSIG(stat_loc);
+            int signal = WTERMSIG(status);
             if (signal == SIGABRT)
             {
+            }
+            else if (signal == SIGKILL)
+            {
+                printf("The test timed out after %d miliseconds.\n", CUNIT_TIMEOUT_MS);
             }
             else
             {
@@ -470,6 +509,9 @@ static void cunit__internal_run_test(const cunit_test_t* test)
                 }
             }
         }
+
+        close(timeout_pipe_fd[0]); // Closing the read end of the pipe
+
         /*
          * Clean Up
          */
