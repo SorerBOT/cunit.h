@@ -4,8 +4,8 @@ Like NUnit or JUnit, but tiny, and written in C for C development.
 ## How do I use it?
 Each tests file represents a single testing-suite. Use the `CUNIT_TEST` macro in order to define a test, and use the macros: `CUNIT_SETUP`, `CUNIT_CLEANUP`, `CUNIT_SETUP_ONETIME`, `CUNIT_CLEANUP_ONETIME` to define functions that would run before and after every test in the current suite (file of tests). Here is how a complete testing suite might look:
 ```c
-#define CUNIT_IMPLEMENTATION
-#include "..../cunit.h"
+#include <stdio.h>
+#include "../lib/cunit.h"
 
 CUNIT_SETUP_ONETIME()
 {
@@ -29,6 +29,7 @@ CUNIT_TEST(str_eq)
     CUNIT_EXPECT_STR_NEQ(NULL, "Bimba");
     CUNIT_EXPECT_STR_NEQ(NULL, NULL);
 }
+
 ```
 ## When does a test timeout?
 The default timeout duration is 3 seconds. However that can easily be changed by defining:
