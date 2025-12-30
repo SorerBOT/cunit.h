@@ -122,7 +122,7 @@
         __attribute__((constructor))            \
         static void _cunit_register_setup(void)        \
         {                                       \
-            cunit__internal_register_setup(_cunit_setup, __FILE__); \
+            cunit__internal_register_func(_cunit_setup, CUNIT_FT_SETUP, __FILE__); \
         }                                       \
         static void _cunit_setup(void)
 
@@ -152,6 +152,15 @@
             cunit__internal_register_cleanup_onetime(_cunit_cleanup_onetime); \
         }                                           \
         void _cunit_cleanup_onetime(void)
+
+typedef enum
+{
+    CUNIT_FT_TEST,
+    CUNIT_FT_SETUP,
+    CUNIT_FT_CLEANUP,
+    CUNIT_FT_SETUP_ONETIME,
+    CUNIT_FT_CLEANUP_ONETIME
+} cunit_func_type_t;
 
 typedef void(*cunit_func_t)(void);
 
@@ -190,7 +199,7 @@ void cunit_free_tests(void);
 void cunit__internal_debug_print_tests_list(void);
 
 void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName);
-void cunit__internal_register_setup(cunit_func_t func, const char* suiteName);
+void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName);
 void cunit__internal_register_cleanup(cunit_func_t func);
 void cunit__internal_register_setup_onetime(cunit_func_t func);
 void cunit__internal_register_cleanup_onetime(cunit_func_t func);
@@ -399,23 +408,58 @@ void cunit__internal_debug_print_tests_list(void)
     printf("\n");
 }
 
-void cunit__internal_register_setup(cunit_func_t func, const char* suiteName)
+void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName)
 {
     cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
-    if (suite != NULL)
+    if (suite == NULL)
     {
-        if (suite->setup_func != NULL)
-        {
-            fprintf(stderr, "setup function redefinition is not allowed.\n");
-            exit(EXIT_FAILURE);
-        }
-        suite->setup_func = func;
-        return;
+        suite = cunit__internal_init_suite(suiteName);
+        cunit__internal_register_suite(suite);
     }
 
-    suite = cunit__internal_init_suite(suiteName);
-    suite->setup_func = func;
-    cunit__internal_register_suite(suite);
+    cunit_func_t* current_func_addr;
+    char* func_type_name;
+
+    switch (func_type)
+    {
+        case (CUNIT_FT_TEST):
+            func_type_name = "TEST";
+            break;
+        case (CUNIT_FT_SETUP):
+            current_func_addr = &suite->setup_func;
+            func_type_name = "SETUP";
+            break;
+        case (CUNIT_FT_CLEANUP):
+            current_func_addr = &suite->cleanup_func;
+            func_type_name = "CLEANUP";
+            break;
+        case (CUNIT_FT_SETUP_ONETIME):
+            current_func_addr = &suite->setup_onetime_func;
+            func_type_name = "SETUP_ONETIME";
+            break;
+        case (CUNIT_FT_CLEANUP_ONETIME):
+            current_func_addr = &suite->cleanup_onetime_func;
+            func_type_name = "CLEANUP_ONETIME";
+            break;
+        default:
+            current_func_addr = NULL;
+            func_type_name = "UNKNOWN FUNCTION";
+            break;
+    }
+
+    if (current_func_addr == NULL)
+    {
+        fprintf(stderr, "Enum value %d is out of range for cunit_func_type_t.\n", func_type);
+        exit(EXIT_FAILURE);
+    }
+
+    if (*current_func_addr != NULL)
+    {
+        fprintf(stderr, "%s function redefinition is not allowed.\n", func_type_name);
+        exit(EXIT_FAILURE);
+    }
+
+    *current_func_addr = func;
 }
 
 void cunit__internal_register_cleanup(cunit_func_t func)
