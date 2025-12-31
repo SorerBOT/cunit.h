@@ -439,7 +439,7 @@ void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_typ
             break;
     }
 
-    if (current_func_addr == NULL)
+    if ( strcmp(func_type_name, "UNKNOWN FUNCTION") == 0 )
     {
         fprintf(stderr, "Enum value %d is out of range for cunit_func_type_t.\n", func_type);
         exit(EXIT_FAILURE);
