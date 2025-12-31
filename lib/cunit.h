@@ -153,15 +153,29 @@
         }                                           \
         static void _cunit_cleanup_onetime(void)
 
+#define CUNIT_FUNC_TYPE_TABLE(X)    \
+    X(CUNIT_FT_TEST)                \
+    X(CUNIT_FT_SETUP)               \
+    X(CUNIT_FT_CLEANUP)             \
+    X(CUNIT_FT_SETUP_ONETIME)       \
+    X(CUNIT_FT_CLEANUP_ONETIME)
+
+#define X_ENUM(name) name,
+
 typedef enum
 {
-    CUNIT_FT_TEST,
-    CUNIT_FT_SETUP,
-    CUNIT_FT_CLEANUP,
-    CUNIT_FT_SETUP_ONETIME,
-    CUNIT_FT_CLEANUP_ONETIME
+    CUNIT_FUNC_TYPE_TABLE(X_ENUM)
+    CUNIT_FT_COUNT
 } cunit_func_type_t;
 
+#undef X_ENUM
+
+#define X_STRING(name) [name] = #name,
+static const char* cunit_func_type_t_names[] =
+{
+    CUNIT_FUNC_TYPE_TABLE(X_STRING)
+};
+#undef X_STRING
 typedef void(*cunit_func_t)(void);
 
 typedef struct _cunit_linked_list_t
@@ -400,6 +414,12 @@ void cunit__internal_debug_print_tests_list(void)
  */
 void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName, const char* testName)
 {
+    if (func_type >= CUNIT_FT_COUNT || func_type < 0)
+    {
+        fprintf(stderr, "Enum value %d is out of range for cunit_func_type_t.\n", func_type);
+        exit(EXIT_FAILURE);
+    }
+
     cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
     if (suite == NULL)
     {
@@ -408,45 +428,33 @@ void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_typ
     }
 
     cunit_func_t* current_func_addr;
-    char* func_type_name;
 
     switch (func_type)
     {
         case (CUNIT_FT_TEST):
-            func_type_name = "TEST";
             cunit__internal_register_test_to_suite(func, testName, suite);
             return;
             break;
         case (CUNIT_FT_SETUP):
             current_func_addr = &suite->setup_func;
-            func_type_name = "SETUP";
             break;
         case (CUNIT_FT_CLEANUP):
             current_func_addr = &suite->cleanup_func;
-            func_type_name = "CLEANUP";
             break;
         case (CUNIT_FT_SETUP_ONETIME):
             current_func_addr = &suite->setup_onetime_func;
-            func_type_name = "SETUP_ONETIME";
             break;
         case (CUNIT_FT_CLEANUP_ONETIME):
             current_func_addr = &suite->cleanup_onetime_func;
-            func_type_name = "CLEANUP_ONETIME";
             break;
         default:
             current_func_addr = NULL;
-            func_type_name = "UNKNOWN FUNCTION";
             break;
-    }
-
-    if ( strcmp(func_type_name, "UNKNOWN FUNCTION") == 0 )
-    {
-        fprintf(stderr, "Enum value %d is out of range for cunit_func_type_t.\n", func_type);
-        exit(EXIT_FAILURE);
     }
 
     if (*current_func_addr != NULL)
     {
+        const char* func_type_name = cunit_func_type_t_names[func_type];
         fprintf(stderr, "%s function redefinition is not allowed.\n", func_type_name);
         exit(EXIT_FAILURE);
     }
