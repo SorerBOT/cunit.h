@@ -113,7 +113,7 @@
         __attribute__((constructor))                        \
         static void _cunit_register_##func(void)            \
         {                                                   \
-            cunit__internal_register_test(_cunit_test_##func, #func, __FILE__); \
+            cunit__internal_register_func(_cunit_test_##func, CUNIT_FT_TEST, __FILE__, #func); \
         }                                                   \
         static void _cunit_test_##func(void)                \
 
@@ -122,7 +122,7 @@
         __attribute__((constructor))            \
         static void _cunit_register_setup(void)        \
         {                                       \
-            cunit__internal_register_func(_cunit_setup, CUNIT_FT_SETUP, __FILE__); \
+            cunit__internal_register_func(_cunit_setup, CUNIT_FT_SETUP, __FILE__, NULL); \
         }                                       \
         static void _cunit_setup(void)
 
@@ -131,7 +131,7 @@
         __attribute__((constructor))                \
         static void _cunit_register_cleanup(void)          \
         {                                           \
-            cunit__internal_register_func(_cunit_cleanup, CUNIT_FT_CLEANUP, __FILE__); \
+            cunit__internal_register_func(_cunit_cleanup, CUNIT_FT_CLEANUP, __FILE__, NULL); \
         }                                           \
         static void _cunit_cleanup(void)
 
@@ -140,7 +140,7 @@
         __attribute__((constructor))                            \
         static void _cunit_register_setup_onetime(void)                \
         {                                                       \
-            cunit__internal_register_func(_cunit_setup_onetime, CUNIT_FT_SETUP_ONETIME, __FILE__); \
+            cunit__internal_register_func(_cunit_setup_onetime, CUNIT_FT_SETUP_ONETIME, __FILE__, NULL); \
         }                                                       \
         static void _cunit_setup_onetime(void)
 
@@ -149,7 +149,7 @@
         __attribute__((constructor))                \
         static void _cunit_register_cleanup_onetime(void)  \
         {                                           \
-            cunit__internal_register_func(_cunit_cleanup_onetime, CUNIT_FT_CLEANUP_ONETIME, __FILE__); \
+            cunit__internal_register_func(_cunit_cleanup_onetime, CUNIT_FT_CLEANUP_ONETIME, __FILE__, NULL); \
         }                                           \
         static void _cunit_cleanup_onetime(void)
 
@@ -198,8 +198,7 @@ void cunit_free_tests(void);
 
 void cunit__internal_debug_print_tests_list(void);
 
-void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName);
-void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName);
+void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName, const char* testName);
 void cunit__internal_register_cleanup(cunit_func_t func);
 void cunit__internal_register_setup_onetime(cunit_func_t func);
 void cunit__internal_register_cleanup_onetime(cunit_func_t func);
@@ -240,7 +239,7 @@ static long double cunit__internal_fabsl(long double x);
 static cunit_suite_t* cunit__internal_init_suite(const char* suiteName);
 static void cunit__internal_register_suite(cunit_suite_t* suite);
 static cunit_suite_t* cunit__internal_find_suite(const char* suiteName);
-static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test);
+static void cunit__internal_register_test_to_suite(cunit_func_t func, const char* name, cunit_suite_t* suite);
 static void cunit__internal_run_test(const cunit_suite_t* suite, const cunit_test_t* test);
 
 cunit_suite_t* suites = NULL;
@@ -343,21 +342,7 @@ static cunit_suite_t* cunit__internal_find_suite(const char* suiteName)
     return NULL;
 }
 
-static void cunit__internal_register_test_to_suite(cunit_suite_t* suite, cunit_test_t* test)
-{
-    if (suite->test_last == NULL)
-    {
-        suite->test_first = test;
-        suite->test_last = test;
-    }
-    else
-    {
-        suite->test_last->list_data.next_node = (cunit_linked_list_t*) test;
-        suite->test_last = test;
-    }
-}
-
-void cunit__internal_register_test(cunit_func_t func, const char* name, const char* suiteName)
+static void cunit__internal_register_test_to_suite(cunit_func_t func, const char* name, cunit_suite_t* suite)
 {
     cunit_test_t* test = malloc(sizeof(cunit_test_t));
 
@@ -377,17 +362,16 @@ void cunit__internal_register_test(cunit_func_t func, const char* name, const ch
         }
     };
 
-    cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
-
-    if (suite != NULL)
+    if (suite->test_last == NULL)
     {
-        cunit__internal_register_test_to_suite(suite, test);
-        return;
+        suite->test_first = test;
+        suite->test_last = test;
     }
-
-    suite = cunit__internal_init_suite(suiteName);
-    cunit__internal_register_test_to_suite(suite, test);
-    cunit__internal_register_suite(suite);
+    else
+    {
+        suite->test_last->list_data.next_node = (cunit_linked_list_t*) test;
+        suite->test_last = test;
+    }
 }
 
 void cunit__internal_debug_print_tests_list(void)
@@ -408,7 +392,13 @@ void cunit__internal_debug_print_tests_list(void)
     printf("\n");
 }
 
-void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName)
+/*
+ * {func} the handler
+ * {func_type} what it handles
+ * {suiteName} under what suite should the function be registered
+ * {testName} if registering a test, how should it be called? Passed as NULL for any other {func_type} than {CUNIT_FT_TEST}
+ */
+void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName, const char* testName)
 {
     cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
     if (suite == NULL)
@@ -424,6 +414,8 @@ void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_typ
     {
         case (CUNIT_FT_TEST):
             func_type_name = "TEST";
+            cunit__internal_register_test_to_suite(func, testName, suite);
+            return;
             break;
         case (CUNIT_FT_SETUP):
             current_func_addr = &suite->setup_func;
@@ -447,7 +439,7 @@ void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_typ
             break;
     }
 
-    if (current_func_addr == NULL)
+    if ( strcmp(func_type_name, "UNKNOWN FUNCTION") == 0 )
     {
         fprintf(stderr, "Enum value %d is out of range for cunit_func_type_t.\n", func_type);
         exit(EXIT_FAILURE);
