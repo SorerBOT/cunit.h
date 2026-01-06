@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../lib/cunit.h"
+#include "../src/cunit.h"
 
 CUNIT_SETUP()
 {

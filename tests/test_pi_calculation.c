@@ -4,7 +4,7 @@
  * In this example, I calculate PI using the leibniz series: https://en.wikipedia.org/wiki/Leibniz_formula_for_%CF%80
  */
 
-#include "../lib/cunit.h"
+#include "../src/cunit.h"
 
 #define NUM_ELEMENTS 1000000
 #define PI 3.14159265358979323846

@@ -2,7 +2,7 @@
 #include <signal.h>
 #define CUNIT_IMPLEMENTATION
 #define CUNIT_USER_TIMEOUT_MS 3000
-#include "../lib/cunit.h"
+#include "../src/cunit.h"
 
 #define REGISTERATION_AUTOMATIQUE 1
 
