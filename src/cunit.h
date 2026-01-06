@@ -91,9 +91,11 @@
 #define CUNIT_ASSERT_MEM_NEQ(a,b, size) cunit__internal_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_MEM_NEQ(a,b, size) cunit__internal_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 0)
 
-#define CUNIT_ASSERT_ARRAY_IS_PERMUTATION(a,b,chunk_size,size) cunit__internal_assert_array_is_permutation((a), (b), (chunk_size), (size), __FILE__, __LINE__, 1)
-#define CUNIT_EXPECT_ARRAY_IS_PERMUTATION(a,b,chunk_size,size) cunit__internal_assert_array_is_permutation((a), (b), (chunk_size), (size), __FILE__, __LINE__, 0)
+#define CUNIT_ASSERT_ARRAY_IS_PERMUTATION(a,b,chunk_length,length) cunit__internal_assert_array_is_permutation((a), (b), (chunk_length), (length), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_ARRAY_IS_PERMUTATION(a,b,chunk_length,length) cunit__internal_assert_array_is_permutation((a), (b), (chunk_length), (length), __FILE__, __LINE__, 0)
 
+#define CUNIT_ASSERT_ARRAY_CONTAINS(a,b,chunk_length,length_a,length_b) cunit__internal_assert_array_contains((a), (b), (chunk_length), (length_a), (length_b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_ARRAY_CONTAINS(a,b,chunk_length,length_a,length_b) cunit__internal_assert_array_contains((a), (b), (chunk_length), (length_a), (length_b), __FILE__, __LINE__, 0)
 /*
  * assert that a contains b
  */
@@ -227,6 +229,7 @@ void cunit__internal_assert_ptr_not_null(const void* a, const char* fileName, in
 void cunit__internal_assert_mem_eq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
 void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
 void cunit__internal_assert_array_is_permutation(const void* a, const void* b, size_t chunk_size, size_t length, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_array_contains(const void* a, const void* b, size_t chunk_size, size_t length_a, size_t length_b, const char* fileName, int lineNumber, int shouldAbort);
 
 #endif /* CUNIT_H */
 
@@ -1136,4 +1139,43 @@ void cunit__internal_assert_array_is_permutation(const void* a, const void* b, s
     }
 }
 
+void cunit__internal_assert_array_contains(const void* a, const void* b, size_t chunk_size, size_t length_a, size_t length_b, const char* fileName, int lineNumber, int shouldAbort)
+{
+    if (a == NULL || b == NULL)
+    {
+        printf("%s:%d FAILED. Expected valid pointers, but got NULL in at least one of them\n", fileName, lineNumber);
+    }
+    else
+    {
+        bool is_found_all = true;
+        for (size_t i = 0; i < length_b; ++i)
+        {
+            const void* b_current_element = b + i * chunk_size;
+            bool is_found = false;
+            for (size_t j = 0; j < length_a; ++j)
+            {
+                const void* a_current_element = a + j * chunk_size;
+                if ( memcmp(b_current_element, a_current_element, chunk_size) == 0 )
+                {
+                    is_found = true;
+                }
+            }
+            if (!is_found)
+            {
+                printf("%s:%d FAILED. Expected contents of %p to contain element number %lu, with address %p, found in %p.\n", fileName, lineNumber, a, i + 1, b_current_element, b);
+                is_found_all = false;
+            }
+        }
+        if (is_found_all)
+        {
+            return;
+        }
+    }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
 #endif /* CUNIT_IMPLEMENTATION */
