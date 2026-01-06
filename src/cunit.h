@@ -90,6 +90,10 @@
 
 #define CUNIT_ASSERT_MEM_NEQ(a,b, size) cunit__internal_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_MEM_NEQ(a,b, size) cunit__internal_assert_mem_neq((a), (b), (size), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_ARRAY_IS_PERMUTATION(a,b,chunk_size,size) cunit__internal_assert_array_is_permutation((a), (b), (chunk_size), (size), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_ARRAY_IS_PERMUTATION(a,b,chunk_size,size) cunit__internal_assert_array_is_permutation((a), (b), (chunk_size), (size), __FILE__, __LINE__, 0)
+
 /*
  * assert that a contains b
  */
@@ -222,6 +226,7 @@ void cunit__internal_assert_ptr_null(const void* a, const char* fileName, int li
 void cunit__internal_assert_ptr_not_null(const void* a, const char* fileName, int lineNumber, int shouldAbort);
 void cunit__internal_assert_mem_eq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
 void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_array_is_permutation(const void* a, const void* b, size_t chunk_size, size_t length, const char* fileName, int lineNumber, int shouldAbort);
 
 #endif /* CUNIT_H */
 
@@ -234,6 +239,7 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length,
 #include <signal.h> // signal numbers, macros
 #include <string.h> // strsignal
 #include <poll.h> // poll
+#include <stdbool.h> // bool
 
 static long double cunit__internal_fabsl(long double x);
 static cunit_suite_t* cunit__internal_init_suite(const char* suiteName);
@@ -1081,6 +1087,46 @@ void cunit__internal_assert_mem_neq(const void* a, const void* b,
             return;
         }
         printf("%s:%d FAILED. Expected contents of pointers %p and %p to be bytewise-different\n", fileName, lineNumber, a, b);
+    }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit__internal_assert_array_is_permutation(const void* a, const void* b, size_t chunk_size, size_t length, const char* fileName, int lineNumber, int shouldAbort)
+{
+    if (a == NULL || b == NULL)
+    {
+        printf("%s:%d FAILED. Expected valid pointers, but got NULL in at least one of them\n", fileName, lineNumber);
+    }
+    else
+    {
+        bool is_found_all = true;
+        for (size_t i = 0; i < length; ++i)
+        {
+            const void* a_current_element = a + i * chunk_size;
+            bool is_found = false;
+            for (size_t j = 0; j < length; ++j)
+            {
+                const void* b_current_element = b + j * chunk_size;
+                if ( memcmp(a_current_element, b_current_element, chunk_size) == 0 )
+                {
+                    is_found = true;
+                }
+            }
+            if (!is_found)
+            {
+                printf("%s:%d FAILED. Expected contents of %p to contain element number %lu, with address %p, found in %p.\n", fileName, lineNumber, b, i + 1, a_current_element, a);
+                is_found_all = false;
+            }
+        }
+        if (is_found_all)
+        {
+            return;
+        }
     }
 
     if (shouldAbort)
