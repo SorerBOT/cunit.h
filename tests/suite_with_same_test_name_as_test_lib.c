@@ -1,4 +1,4 @@
-#include "../lib/cunit.h"
+#include "../src/cunit.h"
 
 CUNIT_TEST(assert_true)
 {
