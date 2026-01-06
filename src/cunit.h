@@ -96,6 +96,13 @@
 
 #define CUNIT_ASSERT_ARRAY_CONTAINS(a,b,chunk_length,length_a,length_b) cunit__internal_assert_array_contains((a), (b), (chunk_length), (length_a), (length_b), __FILE__, __LINE__, 1)
 #define CUNIT_EXPECT_ARRAY_CONTAINS(a,b,chunk_length,length_a,length_b) cunit__internal_assert_array_contains((a), (b), (chunk_length), (length_a), (length_b), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_ARRAY_STRINGS_IS_PERMUTATION(a,b,length) cunit__internal_assert_array_strings_is_permutation((const char**)(a), (const char**)(b), (length), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_ARRAY_STRINGS_IS_PERMUTATION(a,b,length) cunit__internal_assert_array_strings_is_permutation((const char**)(a), (const char**)(b), (length), __FILE__, __LINE__, 0)
+
+#define CUNIT_ASSERT_ARRAY_STRINGS_CONTAINS(a,b,length_a,length_b) cunit__internal_assert_array_strings_contains((const char**)(a), (const char**)(b), (length_a), (length_b), __FILE__, __LINE__, 1)
+#define CUNIT_EXPECT_ARRAY_STRINGS_CONTAINS(a,b,length_a,length_b) cunit__internal_assert_array_strings_contains((const char**)(a), (const char**)(b), (length_a), (length_b), __FILE__, __LINE__, 0)
+
 /*
  * assert that a contains b
  */
@@ -230,6 +237,8 @@ void cunit__internal_assert_mem_eq(const void* a, const void* b, size_t length, 
 void cunit__internal_assert_mem_neq(const void* a, const void* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
 void cunit__internal_assert_array_is_permutation(const void* a, const void* b, size_t chunk_size, size_t length, const char* fileName, int lineNumber, int shouldAbort);
 void cunit__internal_assert_array_contains(const void* a, const void* b, size_t chunk_size, size_t length_a, size_t length_b, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_array_strings_is_permutation(const char* const* a, const char* const* b, size_t length, const char* fileName, int lineNumber, int shouldAbort);
+void cunit__internal_assert_array_strings_contains(const char* const* a, const char* const* b, size_t length_a, size_t length_b, const char* fileName, int lineNumber, int shouldAbort);
 
 #endif /* CUNIT_H */
 
@@ -1163,6 +1172,86 @@ void cunit__internal_assert_array_contains(const void* a, const void* b, size_t 
             if (!is_found)
             {
                 printf("%s:%d FAILED. Expected contents of %p to contain element number %lu, with address %p, found in %p.\n", fileName, lineNumber, a, i + 1, b_current_element, b);
+                is_found_all = false;
+            }
+        }
+        if (is_found_all)
+        {
+            return;
+        }
+    }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit__internal_assert_array_strings_is_permutation(const char* const* a, const char* const* b, size_t length, const char* fileName, int lineNumber, int shouldAbort)
+{
+    if (a == NULL || b == NULL)
+    {
+        printf("%s:%d FAILED. Expected valid pointers. but got NULL in at least one of them.\n", fileName, lineNumber);
+    }
+    else
+    {
+        bool is_found_all = true;
+        for (size_t i = 0; i < length; ++i)
+        {
+            const char* a_current_string = a[i];
+            bool is_found = false;
+            for (size_t j = 0; j < length; ++j)
+            {
+                const char* b_current_string = b[j];
+                if ( strcmp(a_current_string, b_current_string) == 0 )
+                {
+                    is_found = true;
+                }
+            }
+            if (!is_found)
+            {
+                printf("%s:%d FAILED. Expected string array in %p to contain string %s, found in %p.\n", fileName, lineNumber, b, a_current_string, a);
+                is_found_all = false;
+            }
+        }
+        if (is_found_all)
+        {
+            return;
+        }
+    }
+
+    if (shouldAbort)
+    {
+        fflush(stdout);
+        abort();
+    }
+}
+
+void cunit__internal_assert_array_strings_contains(const char* const* a, const char* const* b, size_t length_a, size_t length_b, const char* fileName, int lineNumber, int shouldAbort)
+{
+    if (a == NULL || b == NULL)
+    {
+        printf("%s:%d FAILED. Expected valid pointers, but got NULL in at least one of them.\n", fileName, lineNumber);
+    }
+    else
+    {
+        bool is_found_all = true;
+        for (size_t i = 0; i < length_b; ++i)
+        {
+            const char* b_current_string = b[i];
+            bool is_found = false;
+            for (size_t j = 0; j < length_a; ++j)
+            {
+                const char* a_current_string = a[j];
+                if ( strcmp(b_current_string, a_current_string) == 0 )
+                {
+                    is_found = true;
+                }
+            }
+            if (!is_found)
+            {
+                printf("%s:%d FAILED. Expected string array in %p to contain string %s, found in %p.\n", fileName, lineNumber, a, b_current_string, b);
                 is_found_all = false;
             }
         }
