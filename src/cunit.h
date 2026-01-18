@@ -424,17 +424,10 @@ void cunit__internal_debug_print_tests_list(void)
  */
 void cunit__internal_register_func(cunit_func_t func, cunit_func_type_t func_type, const char* suiteName, const char* testName)
 {
-
-    size_t suite_name_len = strlen(suiteName);
-    size_t ignored_files_prefix_len = strlen(CUNIT_IGNORE_FILE_PREFIX);
-
-    if (ignored_files_prefix_len <= suite_name_len)
+    if ( strstr(suiteName, CUNIT_IGNORE_FILE_PREFIX) != NULL )
     {
-        if ( strncmp(CUNIT_IGNORE_FILE_PREFIX, suiteName, ignored_files_prefix_len) == 0 )
-        {
-            printf("CUNIT: skipped suite %s because its name starts with CUNIT_IGNORE_FILE_PREFIX = %s. To change CUNIT_IGNORE_FILE_PREFIX, you can define CUNIT_USER_IGNORE_FILE_PREFIX where you define CUNIT_IMPLEMENTATION\n", suiteName, CUNIT_IGNORE_FILE_PREFIX);
-            return;
-        }
+        printf("CUNIT: skipped suite %s because its name starts with CUNIT_IGNORE_FILE_PREFIX = %s. To change CUNIT_IGNORE_FILE_PREFIX, you can define CUNIT_USER_IGNORE_FILE_PREFIX where you define CUNIT_IMPLEMENTATION\n", suiteName, CUNIT_IGNORE_FILE_PREFIX);
+        return;
     }
 
     cunit_suite_t* suite = cunit__internal_find_suite(suiteName);
